@@ -1,0 +1,84 @@
+---
+title: "Clustering tree, a visualisation for examining clusterings a increasing resolutions"
+author:
+- Luke Zappia (1, 2)
+- Alicia Oshlack (1, 2)
+date: "1 Bioinformatics, Murdoch Children's Research Institute; 2 School of Biosciences, University of Melbourne"
+output:
+    bookdown::word_document2:
+        reference_docx: style/style.docx
+        pandoc_args: [ "--csl", "style/nature.csl" ]
+bibliography: style/references.bib
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(autodep        = TRUE,
+                      cache          = FALSE,
+                      cache.path     = "cache/",
+                      cache.comments = TRUE,
+                      echo           = FALSE,
+                      error          = FALSE,
+                      fig.path       = "figures/",
+                      fig.width      = 10,
+                      fig.height     = 8,
+                      dev            = c('png', 'pdf'),
+                      message        = FALSE,
+                      warning        = FALSE)
+```
+
+```{r libaries}
+
+```
+
+```{r source}
+
+```
+
+```{r palette}
+
+```
+
+```{r load}
+
+```
+
+# Abstract
+
+# Keywords
+
+# Introduction
+
+# Methods
+
+# Declarations
+
+## Ethics
+
+Not applicable.
+
+## Availability of data and materials
+
+The clustree package is available from our GitHub repository
+(https://github.com/Oshlack/clustree) and the code and datasets used for the
+analysis in this paper are available from
+https://github.com/Oshlack/clustree-paper.
+
+## Competing interests
+
+The authors declare no competing interests.
+
+## Funding
+
+Luke Zappia is supported by an Australian Government Research Training Program
+(RTP) Scholarship. Alicia Oshlack is supported through a National Health and
+Medical Research Council Career Development Fellowship APP1126157. MCRI is
+supported by the Victorian Government's Operational Infrastructure Support
+Program.
+
+## Authors' contributions
+
+## Acknowledgements
+
+# Additional files
+
+# References
