@@ -8,6 +8,7 @@ analysis/cache
 analysis/figures
 analysis/docs
 analysis/*.html
+cache
 
 # Data directory
 #data

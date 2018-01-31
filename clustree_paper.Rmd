@@ -1,5 +1,5 @@
 ---
-title: "Clustering tree, a visualisation for examining clusterings a increasing resolutions"
+title: "Clustering trees, a visualisation for examining clusterings a increasing resolutions"
 author:
 - Luke Zappia (1, 2)
 - Alicia Oshlack (1, 2)
@@ -13,7 +13,7 @@ bibliography: style/references.bib
 
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(autodep        = TRUE,
-                      cache          = FALSE,
+                      cache          = TRUE,
                       cache.path     = "cache/",
                       cache.comments = TRUE,
                       echo           = FALSE,
@@ -56,6 +56,37 @@ library("here")
 * Selecting number of clusters is hard
 * Usually measure a single clustering
 * Look at changes across resolutions
+
+Clustering analysis is commonly used to group similar samples for a diverse
+range of applications. Typically the goal of clustering is to form groups where
+each sample is more similar to the other samples in the same group than to
+samples in other groups. While other forms of clustering exist, such as fuzzy or
+soft clustering where each sample is assigned to every cluster with some
+probability or hierarchical clustering which forms a tree of samples, most
+methods form hard clusters where each sample is assigned to a single group.
+This goal can be achieved in a variety of ways, for example by considering the
+distances between sample, areas of density across the dataset or relationships
+to statistical distributions.
+
+In many cases the number of groups that should be present in a dataset is not
+known in advance and deciding the correct number of clusters to use is a
+significant challenge. For some algorithms, such as $k$-means clustering, the
+number of clusters must be explicitly provided while others have parameters
+that, directly or indirectly, control the resolution of the clustering produced.
+While there are methods and statistics (such as the elbow method or silhouette)
+designed to help analysts decide which clustering resolution to use they
+typically only consider a single set of samples or clusters at a time.
+
+An alternative approach would be to consider clusterings at multiple resolutions
+and look at how samples change groupings as the number of clusters increases.
+This is the approach taken by the clustering tree visualisation we present here:
+a dataset is clustered at multiple resolutions, the overlap between clusters at
+adjacent resolutions is used to build edges and the resulting graph is
+presented as a tree. This tree can be used to examine how clusters are
+related to each other, which clusters are distinct and which are unstable. In
+the following sections we describe how we construct such a tree and present
+examples of trees built from a classical clustering dataset and a complex
+single-cell RNA-sequencing (scRNA-seq) dataset.
 
 # Building a clustering tree
 
