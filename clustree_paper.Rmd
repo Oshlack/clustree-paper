@@ -52,11 +52,37 @@ library("here")
 
 # Introduction
 
+* Clustering used for many things
+* Selecting number of clusters is hard
+* Usually measure a single clustering
+* Look at changes across resolutions
+
+# Building a clustering tree
+
+* Cluster data at multiple resolutions
+* Compare clusterings at adjacent resolutions
+* Calculate statistics
+* Build graph
+* Visualise tree
+
+# A simple example
+
+* Iris dataset
+* Clustered using k-means
+* Features of tree...
+
 ```{r iris-tree}
 data("iris_clusts")
 
 clustree(iris_clusts, prefix = "K")
 ```
+
+# Clustering trees for scRNA-seq data
+
+* Clustering used for scRNA-seq data
+* PBMC dataset
+* Clustered using Seurat
+* Features of tree...
 
 ```{r seurat-load}
 pbmc_data <- Read10X(here("data"))
@@ -66,17 +92,17 @@ pbmc <- CreateSeuratObject(raw.data = pbmc_data, min.cells = 3, min.genes = 200,
 
 ```{r seurat-QC}
 mito_genes <- grep(pattern = "^MT-", x = rownames(x = pbmc@data), value = TRUE)
-percent_mito <- Matrix::colSums(pbmc@raw.data[mito_genes, ]) / 
+percent_mito <- Matrix::colSums(pbmc@raw.data[mito_genes, ]) /
                 Matrix::colSums(pbmc@raw.data)
 pbmc <- AddMetaData(object = pbmc, metadata = percent_mito,
                     col.name = "percent_mito")
-pbmc <- FilterCells(object = pbmc, subset.names = c("nGene", "percent_mito"), 
+pbmc <- FilterCells(object = pbmc, subset.names = c("nGene", "percent_mito"),
                     low.thresholds = c(200, -Inf),
                     high.thresholds = c(2500, 0.05))
 ```
 
 ```{r seurat-norm}
-pbmc <- NormalizeData(object = pbmc, normalization.method = "LogNormalize", 
+pbmc <- NormalizeData(object = pbmc, normalization.method = "LogNormalize",
                       scale.factor = 10000, display.progress = FALSE)
 pbmc <- FindVariableGenes(object = pbmc, mean.function = ExpMean,
                           dispersion.function = LogVMR, x.low.cutoff = 0.0125,
@@ -91,7 +117,7 @@ pbmc <- ScaleData(object = pbmc, vars.to.regress = c("nUMI", "percent_mito"),
 
 ```{r seurat-cluster}
 pbmc <- RunPCA(object = pbmc, pc.genes = pbmc@var.genes, do.print = FALSE)
-pbmc <- FindClusters(object = pbmc, reduction.type = "pca", dims.use = 1:10, 
+pbmc <- FindClusters(object = pbmc, reduction.type = "pca", dims.use = 1:10,
                      resolution = seq(0, 1, 0.1), print.output = FALSE)
 ```
 
@@ -99,6 +125,10 @@ pbmc <- FindClusters(object = pbmc, reduction.type = "pca", dims.use = 1:10,
 clustree(pbmc)
 ```
 
+# Discussion and conclusion
+
+* Picking number of clusters is hard
+* Clustering trees let you see what happens as resolution increases
 
 # Methods
 
