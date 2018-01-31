@@ -27,7 +27,7 @@ knitr::opts_chunk$set(autodep        = TRUE,
 ```
 
 ```{r libaries}
-
+library("clustree")
 ```
 
 ```{r source}
@@ -47,6 +47,12 @@ knitr::opts_chunk$set(autodep        = TRUE,
 # Keywords
 
 # Introduction
+
+```{r iris-tree}
+data("iris_clusts")
+
+clustree(iris_clusts, prefix = "K")
+```
 
 # Methods
 
