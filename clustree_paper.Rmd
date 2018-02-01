@@ -26,12 +26,13 @@ knitr::opts_chunk$set(autodep        = TRUE,
                       warning        = FALSE)
 ```
 
-```{r libaries}
+```{r libaries, cache = FALSE}
 library("clustree")
 library("Seurat")
 library("Matrix")
 
 library("here")
+library("knitr")
 ```
 
 ```{r source}
@@ -86,7 +87,8 @@ presented as a tree. This tree can be used to examine how clusters are
 related to each other, which clusters are distinct and which are unstable. In
 the following sections we describe how we construct such a tree and present
 examples of trees built from a classical clustering dataset and a complex
-single-cell RNA-sequencing (scRNA-seq) dataset.
+single-cell RNA-sequencing (scRNA-seq) dataset. The kinds of figures shown here
+can be produced in R using our publicly available clustree package.
 
 # Building a clustering tree
 
@@ -95,6 +97,46 @@ single-cell RNA-sequencing (scRNA-seq) dataset.
 * Calculate statistics
 * Build graph
 * Visualise tree
+
+To build a clustering tree we start with a set of clusterings allocating samples
+to groups at different resolutions. These could be produced using any
+hard-clustering algorithm that allows control of the number of clusters in
+some way. For example this could be a set of samples clustered using $k$-means
+with $k = 1, 2, 3$ as shown in Figure \@ref(fig:algorithm). We then sort these 
+clusterings so that they are ordered by increasing resolution (here that would
+be $k$), then consider pairs of adjacent clusterings. Each cluster at a specific 
+resolution ($k$) is compared with each cluster in the next highest resolution
+($k + 1$) and the overlap is computed as the number of samples that are assigned
+to both. We next build a graph where each node is a cluster and each edge is an
+overlap between clusters.
+
+```{r algorithm, fig.cap = "Illustration of the steps required to build a clustering tree. First a dataset must be clustered at different resolutions. A graph in then constructed with nodes representing clusters and edges showing the overlap in samples between them. Statistics are then calculate, edges filtered and the final graph visualised.", cache = FALSE}
+include_graphics(here("figures/algorithm.png"))
+```
+
+Many of the edges will be empty (no samples in Cluster A at resolution $k$ end
+up in Cluster B at resolution $k + 1$). In some datasets there may also be edges
+that contain few samples which are not informative and result in a cluttered
+tree. This is easily handled by setting a threshold number of samples to remove
+low-count edges. While this approach can be useful for removing edges from the
+graph it is often more informative to instead emphasise more important edges.
+In this case the count of samples is not the correct statistic to use as it
+naturally favours edges at higher resolutions and those connecting larger
+clusters. Instead we propose using the in proportion, the ratio between the
+number of samples on the edge and the number of samples in the cluster it goes
+towards. This measure shows the importance of the edge to the higher resolution
+cluster, independently of the cluster size. We can apply a second threshold to
+this value in order to remove less important edges.
+
+We then visualise the final graph using a tree layout. This places the cluster
+nodes in a series of layers where each layer is a different resolution and edges
+show the transfer of samples through those resolutions. Edges are coloured
+according to the number of samples they represent and the in proportion is used
+to control the edge transparency, highlighting more important edges. By default
+nodes are sized according the size of the cluster they represent, with their
+colour indicating the resolution. The clustree package also includes options
+for controlling the aesthetics of nodes based on the attributes of samples in
+the clusters they represent.
 
 # A simple example
 
