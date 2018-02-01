@@ -33,6 +33,8 @@ library("Matrix")
 
 library("here")
 library("knitr")
+library("ggplot2")
+library("cowplot")
 ```
 
 ```{r source}
@@ -102,9 +104,9 @@ To build a clustering tree we start with a set of clusterings allocating samples
 to groups at different resolutions. These could be produced using any
 hard-clustering algorithm that allows control of the number of clusters in
 some way. For example this could be a set of samples clustered using $k$-means
-with $k = 1, 2, 3$ as shown in Figure \@ref(fig:algorithm). We then sort these 
+with $k = 1, 2, 3$ as shown in Figure \@ref(fig:algorithm). We then sort these
 clusterings so that they are ordered by increasing resolution (here that would
-be $k$), then consider pairs of adjacent clusterings. Each cluster at a specific 
+be $k$), then consider pairs of adjacent clusterings. Each cluster at a specific
 resolution ($k$) is compared with each cluster in the next highest resolution
 ($k + 1$) and the overlap is computed as the number of samples that are assigned
 to both. We next build a graph where each node is a cluster and each edge is an
@@ -144,11 +146,61 @@ the clusters they represent.
 * Clustered using k-means
 * Features of tree...
 
-```{r iris-tree}
+To further illustrate how a clustering tree is built we will work through an
+example using the classical iris dataset. This dataset contains measurements of
+the sepal length, sepal width, petal length and petal width from 150 iris
+flowers, 50 from each of three species: _Iris setosa_, _Iris versicolor_ and
+_Iris virginica_. The iris dataset is commonly used as example for both
+clustering and classification problems with the _Iris setosa_ samples being
+significantly different to, and linearly separable from, the other samples. We
+have clustered this dataset using $k$-means clustering with $k = 1,...,5$ and
+produced the clustering tree shown in Figure \@ref(fig:iris-tree)A.
+
+```{r iris-tree, fig.cap = "Clustering trees based on $k$-means clustering of the iris dataset. In A nodes are coloured according to the value of $k$ and sized according to the number of samples they represent. Edges are coloured according to the number of samples (from blue representing few to yellow reprenting many) and the transparency adjusted according to the in proportion, with stronger lines showing edges that are more important to the higher resolution cluster. B shows the same tree with the node colouring changed to show the mean petal length of the samples in each cluster."}
 data("iris_clusts")
 
-clustree(iris_clusts, prefix = "K")
+p1 <- clustree(iris_clusts, prefix = "K")
+p2 <- clustree(iris_clusts, prefix = "K", node_colour = "Petal.Length",
+               node_colour_aggr = mean) +
+    scale_colour_viridis_c(option = "plasma", begin = 0.3)
+panel <- plot_grid(p1, p2, labels = "AUTO")
+
+save_plot(here("figures/iris_tree.png"), panel, ncol = 2, base_height = 8)
+save_plot(here("figures/iris_tree.pdf"), panel, ncol = 2, base_height = 8)
+
+include_graphics(here("figures/iris_tree.png"))
 ```
+
+We see that there is one branch of the tree that is clearly distinct (presumably
+representing _Iris setosa_), remaining unchanged regardless of the number of
+clusters. On the other side we see the cluster at $k = 2$ cleanly split into two
+clusters (presumably _Iris versicolor_ and _Iris virginica_) at $k = 3$ but as
+we move to $k = 4$ and $k = 5$ we see clusters being formed from multiple
+branches with more low proportion edges. This kind of pattern can be an
+indication that the data has become over-clustered and we have begun to
+introduce artificial groupings. In this case we know that $k = 3$ is the correct
+choice but this is also the value that is suggested by this tree.
+
+We can check our assumption that the distinct branch represents the _Iris
+setosa_ samples and the other two clusters at $k = 3$ are _Iris versicolor_ and
+_Iris virginica_ by overlaying some known information about the samples. In
+Figure \@ref(fig:iris-tree)B we have coloured the nodes by the mean petal width
+of the samples they contain. We can now see that clusters in the distinct branch
+have the shortest petals, with Cluster 1 at $k = 3$ having an intermediate
+length and Cluster 3 the longest petals. This feature is known to separate the
+samples into the expected species with _Iris setosa_ have the shortest petals on
+average, _Iris versicolor_ an intermediate length and _Iris virginica_ the
+longest.
+
+Although this is a very simple example it still highlights some of the benefits
+of viewing a clustering tree. We get some indication of the correct resolution
+to use by examining the edges and we can overlay known information to assess the
+quality of the clustering. For example if we that all clusters had the same
+mean petal length that we would be a good suggestion that the clustering has
+not been successful as we know this is an important feature in this dataset that
+should separate the species. We could potentially learn more by looking at which
+samples follow low proportion edges or overlaying a series of features to try
+and understand what particular clusters to split.
 
 # Clustering trees for scRNA-seq data
 
