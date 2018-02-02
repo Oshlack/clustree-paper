@@ -344,6 +344,38 @@ split in biologically sensible ways.
 * Picking number of clusters is hard
 * Clustering trees let you see what happens as resolution increases
 
+Clustering similar samples into groups is a useful technique in many fields but
+often analysts are faced with the tricky problem of deciding which clustering
+resolution to use. Traditional approaches to this problem typically consider
+a single cluster or sample at a time and may rely on prior knowledge of sample
+labels. Here we present clustering trees, an alternative visualisation that
+shows the relationships between clusterings at multiple resolutions.
+
+Clustering trees display how clusters are divided as resolution increases,
+which cluster are clearly separate and distinct, which are related to each other
+and how sample change as more clusters are produced. Although clustering trees
+can appear similar to the trees produced from hierarchical clustering there
+are several important difference. Hierarchical clustering considers the
+relationships between individual samples and doesn't provide an obvious way to
+form groups. In contrast clustering trees are independent of any particular
+clustering method and show the relationships between distinct groups, any of
+which could be used for further analysis.
+
+To illustrate the uses of clustering trees we presented two examples, one using
+the classical iris dataset and a second based on a complex scRNA-seq dataset.
+Both examples demonstrate how a clustering tree can suggest the correct
+resolution to use and how overlaying extra information can help to validate
+those clusters. This is of particular use to scRNA-seq analysis as these
+dataset are often large, noisy and contain an unknown number of cell types.
+
+Even when the number of clusters to choose is not a problem clustering trees can
+be a valuable tool. They provide a compact, information dense, visualisation
+that can display summarised information across a range of clusters. By modifying
+the appearance of cluster nodes based on attributes of the samples they
+represent clusterings can be evaluated and identities of clusters established.
+More experience with clustering trees may suggest other applications and they
+could be adapted to be more flexible, such as allowing fuzzy clusterings.
+
 # Methods
 
 # Declarations
