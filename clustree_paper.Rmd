@@ -209,6 +209,33 @@ and understand what particular clusters to split.
 * Clustered using Seurat
 * Features of tree...
 
+One field that recently begun to make heavy use of clustering techniques is the
+analysis of scRNA-seq data. Single-cell RNA-sequencing is a technology that
+measures how genes are expressed in individual cells. This technology has been
+rapidly adopted in fields like developmental biology where is valuable to have
+information from single cells rather than the measurements that are averaged
+across the many cells in a sample using older RNA sequencing technologies. One
+of the key uses for scRNA-seq is to discover and interrogate the different cell
+types present in a sample of a complex tissue. In this situation clustering is
+typically used to group similar cells and genes that are differentially
+expressed between groups are used to identify what processes those cells might
+be involved. The number of cell types in an scRNA-seq dataset can vary depending
+on factors such as the tissue being studied, it's developmental or environmental
+state and the number of cells captured, therefore deciding which clustering
+resolution to use is an important consideration in this kind of analysis.
+
+As an example of how clustering trees can be used in the scRNA-seq context we
+present an example based on a commonly used Peripheral Blood Mononuclear Cell
+(PBMC) dataset. This dataset was originally produced by 10x Genomics and
+contains 2700 PBMCs representing a range of well-studied immune cell types. We
+have analysed this dataset using the Seurat package, a commonly used toolkit for
+scRNA-seq analysis, following the instructions in their tutorial with the
+exception of varying the clustering resolution parameter from zero to one.
+Seurat uses a graph-based clustered algorithm and the resolution parameter
+controls the partitioning of this graph, with higher values resulting in more
+clusters. The clustering tree produced from this analysis is shown in Figure
+\@ref(fig:seurat-tree).
+
 ```{r seurat-load}
 pbmc_data <- Read10X(here("data"))
 pbmc <- CreateSeuratObject(raw.data = pbmc_data, min.cells = 3, min.genes = 200,
@@ -246,9 +273,71 @@ pbmc <- FindClusters(object = pbmc, reduction.type = "pca", dims.use = 1:10,
                      resolution = seq(0, 1, 0.1), print.output = FALSE)
 ```
 
-```{r seurat-tree}
-clustree(pbmc)
+```{r seurat-save}
+saveRDS(pbmc, here("output/pbmc_clustered.Rds"))
 ```
+
+```{r seurat-tree, fig.cap = "Clustering tree of a dataset of 2700 Peripheral Blood Mononuclear Cells (PBMCs) showing results from clustering using Seurat with resolutions parameters from zero to one. At a resolution of 0.1 we see the formation four main branches, one of which continues to split up to a resolution of 0.5. At higher resolutions we see only minor changes in the clusters formed."}
+pp <- clustree(pbmc)
+
+ggsave(here("figures/seurat_tree.png"), pp, width = 16, height = 10)
+ggsave(here("figures/seurat_tree.pdf"), pp, width = 16, height = 10)
+
+include_graphics(here("figures/seurat_tree.png"))
+```
+
+We see that four main branches quickly form in this tree at a resolution of just
+0.1. One of these branches, starting with Cluster 3 at resolution 0.1 remains
+unchanged while the branch starting with Cluster 2 splits only once at a
+resolution of 0.4. Most of the branching occurs in the branch starting with
+Cluster 1 which consistently has sub-branches split off to form new clusters as
+the resolution increases. There are two regions of stability in the tree; at
+resolution 0.5-0.6 and resolution 0.7-1.0 where the branch starting the Cluster
+0 splits in two. For most of the Seurat tutorial a resolution of 0.6 is used but
+the authors note that by moving to a resolution of 0.8 a split can be achieved
+between memory and naive CD4 T cells. This is a split that could be anticipated
+by looking at the clustering tree.
+
+Known marker genes are commonly used to identify what cell types clusters
+correspond to. Overlaying gene expression onto a clustering tree is an
+alternative way to view this information and can help to show when clusters
+containing pure cell populations are formed. Figure \@ref(fig:seurat-genes)
+shows the PBMC clustering tree overlaid with the expression of some known
+marker genes.
+
+```{r seurat-genes, fig.cap = "Clustering trees of the PBMC dataset coloured according to the expression of known markers. CD19 (A) identifies B cells, CD14 (B) shows a population of monocytes, CD3D (C) is a marker of T cells and CCR7 (D) shows the split between memory and naive CD4 T cells."}
+p1 <- clustree(pbmc, node_colour = "CD19", node_colour_aggr = mean) +
+    scale_colour_viridis_c(option = "plasma", begin = 0.3)
+p2 <- clustree(pbmc, node_colour = "CD14", node_colour_aggr = mean) +
+    scale_colour_viridis_c(option = "plasma", begin = 0.3)
+p3 <- clustree(pbmc, node_colour = "CD3D", node_colour_aggr = mean) +
+    scale_colour_viridis_c(option = "plasma", begin = 0.3)
+p4 <- clustree(pbmc, node_colour = "CCR7", node_colour_aggr = mean) +
+    scale_colour_viridis_c(option = "plasma", begin = 0.3)
+
+panel <- plot_grid(p1, p2, p3, p4, labels = "AUTO")
+
+save_plot(here("figures/seurat_genes.png"), panel, ncol = 2, base_height = 16,
+          base_aspect_ratio = 0.8)
+save_plot(here("figures/seurat_genes.pdf"), panel, ncol = 2, base_height = 16,
+          base_aspect_ratio = 0.8)
+
+include_graphics(here("figures/seurat_genes.png"))
+```
+
+By adding this extra information we can quickly identify some of the cell types.
+CD19 (Figure \@ref(fig:seurat-genes)A) is a marker of B cells and is clearly
+expressed in the most distinct branch of the tree. CD14 (Figure
+\@ref(fig:seurat-genes)B) is a marker of one type of monocytes which becomes
+more expressed as we follow one of the central branches, allowing us which
+resolution identifies a pure population of these cells. CD3D (Figure
+\@ref(fig:seurat-genes)C) is a general marker of T cells and is expressed in two
+separate branches, one which splits into low and high expression of CCR7 (Figure
+\@ref(fig:seurat-genes)D), separating memory and naive CD4 T cells. While there
+are alternative visualisations that can show differences in expression between
+clusters by adding this information to a clustering tree we can see if more
+populations can be identified as resolution is increased and if clusters are
+split in biologically sensible ways.
 
 # Discussion and conclusion
 
