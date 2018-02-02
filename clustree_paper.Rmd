@@ -27,26 +27,20 @@ knitr::opts_chunk$set(autodep        = TRUE,
 ```
 
 ```{r libaries, cache = FALSE}
+# clustree
 library("clustree")
+
+# Seurat
 library("Seurat")
 library("Matrix")
 
-library("here")
-library("knitr")
+# Plotting
 library("ggplot2")
 library("cowplot")
-```
 
-```{r source}
-
-```
-
-```{r palette}
-
-```
-
-```{r load}
-
+# Document
+library("here")
+library("knitr")
 ```
 
 # Abstract
@@ -54,11 +48,6 @@ library("cowplot")
 # Keywords
 
 # Introduction
-
-* Clustering used for many things
-* Selecting number of clusters is hard
-* Usually measure a single clustering
-* Look at changes across resolutions
 
 Clustering analysis is commonly used to group similar samples for a diverse
 range of applications. Typically the goal of clustering is to form groups where
@@ -93,12 +82,6 @@ single-cell RNA-sequencing (scRNA-seq) dataset. The kinds of figures shown here
 can be produced in R using our publicly available clustree package.
 
 # Building a clustering tree
-
-* Cluster data at multiple resolutions
-* Compare clusterings at adjacent resolutions
-* Calculate statistics
-* Build graph
-* Visualise tree
 
 To build a clustering tree we start with a set of clusterings allocating samples
 to groups at different resolutions. These could be produced using any
@@ -141,10 +124,6 @@ for controlling the aesthetics of nodes based on the attributes of samples in
 the clusters they represent.
 
 # A simple example
-
-* Iris dataset
-* Clustered using k-means
-* Features of tree...
 
 To further illustrate how a clustering tree is built we will work through an
 example using the classical iris dataset. This dataset contains measurements of
@@ -203,11 +182,6 @@ samples follow low proportion edges or overlaying a series of features to try
 and understand what particular clusters to split.
 
 # Clustering trees for scRNA-seq data
-
-* Clustering used for scRNA-seq data
-* PBMC dataset
-* Clustered using Seurat
-* Features of tree...
 
 One field that recently begun to make heavy use of clustering techniques is the
 analysis of scRNA-seq data. Single-cell RNA-sequencing is a technology that
@@ -340,9 +314,6 @@ populations can be identified as resolution is increased and if clusters are
 split in biologically sensible ways.
 
 # Discussion and conclusion
-
-* Picking number of clusters is hard
-* Clustering trees let you see what happens as resolution increases
 
 Clustering similar samples into groups is a useful technique in many fields but
 often analysts are faced with the tricky problem of deciding which clustering
