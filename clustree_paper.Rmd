@@ -1,5 +1,5 @@
 ---
-title: "Clustering trees, a visualisation for examining clusterings a increasing resolutions"
+title: "Clustering trees: a visualisation for examining clusterings a increasing resolutions"
 author:
 - Luke Zappia (1, 2)
 - Alicia Oshlack (1, 2)
@@ -63,11 +63,12 @@ to statistical distributions.
 In many cases the number of groups that should be present in a dataset is not
 known in advance and deciding the correct number of clusters to use is a
 significant challenge. For some algorithms, such as $k$-means clustering, the
-number of clusters must be explicitly provided while others have parameters
-that, directly or indirectly, control the resolution of the clustering produced.
-While there are methods and statistics (such as the elbow method or silhouette)
-designed to help analysts decide which clustering resolution to use they
-typically only consider a single set of samples or clusters at a time.
+number of clusters must be explicitly provided while other methods have
+parameters that, directly or indirectly, control the clustering resolution and
+therefore the number of clusters produced. While there are methods and
+statistics (such as the elbow method or silhouette) designed to help analysts
+decide which clustering resolution to use they typically produce a single score
+which only considers a single set of samples or clusters at a time.
 
 An alternative approach would be to consider clusterings at multiple resolutions
 and look at how samples change groupings as the number of clusters increases.
@@ -85,43 +86,45 @@ can be produced in R using our publicly available clustree package.
 
 To build a clustering tree we start with a set of clusterings allocating samples
 to groups at different resolutions. These could be produced using any
-hard-clustering algorithm that allows control of the number of clusters in
-some way. For example this could be a set of samples clustered using $k$-means
-with $k = 1, 2, 3$ as shown in Figure \@ref(fig:algorithm). We then sort these
+hard-clustering algorithm that allows control of the number of clusters in some
+way. For example this could be a set of samples clustered using $k$-means with
+$k = 1, 2, 3$ as shown in Figure \@ref(fig:algorithm). We then sort these
 clusterings so that they are ordered by increasing resolution (here that would
-be $k$), then consider pairs of adjacent clusterings. Each cluster at a specific
-resolution ($k$) is compared with each cluster in the next highest resolution
-($k + 1$) and the overlap is computed as the number of samples that are assigned
-to both. We next build a graph where each node is a cluster and each edge is an
-overlap between clusters.
+be $k$), then consider pairs of adjacent clusterings. Each cluster ($c_i$) at a
+specific resolution ($k$) is compared with each cluster ($c_j$) in the next
+highest resolution ($k + 1$) and the overlap between the two clusters is
+computed as the number of samples that are assigned to both $c_i$ and $c_j$. We
+next build a graph where each node is a cluster and each edge is an overlap
+between clusters.
 
-```{r algorithm, fig.cap = "Illustration of the steps required to build a clustering tree. First a dataset must be clustered at different resolutions. A graph in then constructed with nodes representing clusters and edges showing the overlap in samples between them. Statistics are then calculate, edges filtered and the final graph visualised.", cache = FALSE}
+```{r algorithm, fig.cap = "Illustration of the steps required to build a clustering tree. First a dataset must be clustered at different resolutions. A graph is then constructed with nodes representing clusters and edges showing the overlap in samples between them. Statistics are then calculated, edges filtered and the final graph visualised.", cache = FALSE}
 include_graphics(here("figures/algorithm.png"))
 ```
 
-Many of the edges will be empty (no samples in Cluster A at resolution $k$ end
-up in Cluster B at resolution $k + 1$). In some datasets there may also be edges
-that contain few samples which are not informative and result in a cluttered
-tree. This is easily handled by setting a threshold number of samples to remove
-low-count edges. While this approach can be useful for removing edges from the
-graph it is often more informative to instead emphasise more important edges.
-In this case the count of samples is not the correct statistic to use as it
-naturally favours edges at higher resolutions and those connecting larger
-clusters. Instead we propose using the in proportion, the ratio between the
-number of samples on the edge and the number of samples in the cluster it goes
-towards. This measure shows the importance of the edge to the higher resolution
-cluster, independently of the cluster size. We can apply a second threshold to
-this value in order to remove less important edges.
+Many of the edges will be empty, for example in Figure \@ref(fig:algorithm) no
+samples in largest cluster at $k = 2$ end up in the smallest cluster at $k = 3$.
+In some datasets there may also be edges that contain few samples which are not
+informative and result in a cluttered tree. This is easily handled by setting a
+threshold number of samples to remove low-count edges. While this approach can
+be useful for removing edges from the graph it is often more informative to
+instead emphasise more important edges. In this case the count of samples is not
+the correct statistic to use as it naturally favours edges at lower resolutions
+and those connecting larger clusters. Instead we propose using the
+in-proportion, the ratio between the number of samples on the edge and the
+number of samples in the cluster it goes towards. This measure shows the
+importance of the edge to the higher resolution cluster, independently of the
+cluster size. We can apply a second threshold to this value in order to remove
+less important edges.
 
 We then visualise the final graph using a tree layout. This places the cluster
-nodes in a series of layers where each layer is a different resolution and edges
-show the transfer of samples through those resolutions. Edges are coloured
-according to the number of samples they represent and the in proportion is used
-to control the edge transparency, highlighting more important edges. By default
-nodes are sized according the size of the cluster they represent, with their
-colour indicating the resolution. The clustree package also includes options
-for controlling the aesthetics of nodes based on the attributes of samples in
-the clusters they represent.
+nodes in a series of layers where each layer is a different clustering
+resolution and edges show the transition of samples through those resolutions.
+Edges are coloured according to the number of samples they represent and the in
+proportion is used to control the edge transparency, highlighting more important
+edges. By default, nodes are sized according to the size of the cluster they
+represent, with their colour indicating the resolution. The clustree package
+also includes options for controlling the aesthetics of nodes based on the
+attributes of samples in the clusters they represent.
 
 # A simple example
 
@@ -135,7 +138,7 @@ significantly different to, and linearly separable from, the other samples. We
 have clustered this dataset using $k$-means clustering with $k = 1,...,5$ and
 produced the clustering tree shown in Figure \@ref(fig:iris-tree)A.
 
-```{r iris-tree, fig.cap = "Clustering trees based on $k$-means clustering of the iris dataset. In A nodes are coloured according to the value of $k$ and sized according to the number of samples they represent. Edges are coloured according to the number of samples (from blue representing few to yellow reprenting many) and the transparency adjusted according to the in proportion, with stronger lines showing edges that are more important to the higher resolution cluster. B shows the same tree with the node colouring changed to show the mean petal length of the samples in each cluster."}
+```{r iris-tree, fig.cap = "Clustering trees based on $k$-means clustering of the iris dataset. In A nodes are coloured according to the value of $k$ and sized according to the number of samples they represent. Edges are coloured according to the number of samples (from blue representing few to yellow representing many) and the transparency adjusted according to the in-proportion, with stronger lines showing edges that are more important to the higher resolution cluster. Cluster labels are randomly assigned by the $k$-means algorithm. B shows the same tree with the node colouring changed to show the mean petal length of the samples in each cluster."}
 data("iris_clusts")
 
 p1 <- clustree(iris_clusts, prefix = "K")
@@ -163,7 +166,7 @@ choice but this is also the value that is suggested by this tree.
 We can check our assumption that the distinct branch represents the _Iris
 setosa_ samples and the other two clusters at $k = 3$ are _Iris versicolor_ and
 _Iris virginica_ by overlaying some known information about the samples. In
-Figure \@ref(fig:iris-tree)B we have coloured the nodes by the mean petal width
+Figure \@ref(fig:iris-tree)B we have coloured the nodes by the mean petal length
 of the samples they contain. We can now see that clusters in the distinct branch
 have the shortest petals, with Cluster 1 at $k = 3$ having an intermediate
 length and Cluster 3 the longest petals. This feature is known to separate the
@@ -172,31 +175,35 @@ average, _Iris versicolor_ an intermediate length and _Iris virginica_ the
 longest.
 
 Although this is a very simple example it still highlights some of the benefits
-of viewing a clustering tree. We get some indication of the correct resolution
-to use by examining the edges and we can overlay known information to assess the
-quality of the clustering. For example if we that all clusters had the same
-mean petal length that we would be a good suggestion that the clustering has
-not been successful as we know this is an important feature in this dataset that
-should separate the species. We could potentially learn more by looking at which
-samples follow low proportion edges or overlaying a series of features to try
-and understand what particular clusters to split.
+of viewing a clustering tree. We get some indication of the correct clustering
+resolution by examining the edges and we can overlay known information to assess
+the quality of the clustering. For example if we observed that all clusters had
+the same mean petal length it would suggest that the clustering has not been
+successful as we know this is an important feature known to separate the
+species. We could potentially learn more by looking at which samples follow low
+proportion edges or overlaying a series of features to try and understand what
+particular clusters to split.
 
 # Clustering trees for scRNA-seq data
 
 One field that recently begun to make heavy use of clustering techniques is the
-analysis of scRNA-seq data. Single-cell RNA-sequencing is a technology that
-measures how genes are expressed in individual cells. This technology has been
-rapidly adopted in fields like developmental biology where is valuable to have
-information from single cells rather than the measurements that are averaged
-across the many cells in a sample using older RNA sequencing technologies. One
-of the key uses for scRNA-seq is to discover and interrogate the different cell
-types present in a sample of a complex tissue. In this situation clustering is
-typically used to group similar cells and genes that are differentially
-expressed between groups are used to identify what processes those cells might
-be involved. The number of cell types in an scRNA-seq dataset can vary depending
-on factors such as the tissue being studied, it's developmental or environmental
-state and the number of cells captured, therefore deciding which clustering
-resolution to use is an important consideration in this kind of analysis.
+analysis of single-cell RNA-sequencing (scRNA-seq) data. Single-cell
+RNA-sequencing is a recently developed technology that can measure how genes are
+expressed in thousands to millions of individual cells. This technology has been
+rapidly adopted in fields like developmental biology where it is valuable to
+have information from single cells rather than the measurements that are
+averaged across the many different cells in a sample using older RNA sequencing
+technologies. One of the key uses for scRNA-seq is to discover and interrogate
+the different cell types present in a sample of a complex tissue. In this
+situation clustering is typically used to group similar cells based on their
+gene expression and genes that are differentially expressed between groups are
+used to infer the identify or function of those cells. The number of cell types
+in an scRNA-seq dataset can vary depending on factors such as the tissue being
+studied, it's developmental or environmental state and the number of cells
+captured. Often the number of cells types is not known before the data is
+generated and some samples can contin dozens of clusters. Therefore deciding
+which clustering resolution to use is an important consideration in this kind of
+analysis.
 
 As an example of how clustering trees can be used in the scRNA-seq context we
 present an example based on a commonly used Peripheral Blood Mononuclear Cell
@@ -204,11 +211,11 @@ present an example based on a commonly used Peripheral Blood Mononuclear Cell
 contains 2700 PBMCs representing a range of well-studied immune cell types. We
 have analysed this dataset using the Seurat package, a commonly used toolkit for
 scRNA-seq analysis, following the instructions in their tutorial with the
-exception of varying the clustering resolution parameter from zero to one.
-Seurat uses a graph-based clustered algorithm and the resolution parameter
-controls the partitioning of this graph, with higher values resulting in more
-clusters. The clustering tree produced from this analysis is shown in Figure
-\@ref(fig:seurat-tree).
+exception of varying the clustering resolution parameter from zero to one (see
+methods). Seurat uses a graph-based clustering algorithm and the resolution
+parameter controls the partitioning of this graph, with higher values resulting
+in more clusters. The clustering tree produced from this analysis is shown in
+Figure \@ref(fig:seurat-tree).
 
 ```{r seurat-load}
 pbmc_data <- Read10X(here("data"))
@@ -251,7 +258,7 @@ pbmc <- FindClusters(object = pbmc, reduction.type = "pca", dims.use = 1:10,
 saveRDS(pbmc, here("output/pbmc_clustered.Rds"))
 ```
 
-```{r seurat-tree, fig.cap = "Clustering tree of a dataset of 2700 Peripheral Blood Mononuclear Cells (PBMCs) showing results from clustering using Seurat with resolutions parameters from zero to one. At a resolution of 0.1 we see the formation four main branches, one of which continues to split up to a resolution of 0.5. At higher resolutions we see only minor changes in the clusters formed."}
+```{r seurat-tree, fig.cap = "Clustering tree of a dataset of 2700 Peripheral Blood Mononuclear Cells (PBMCs) showing results from clustering using Seurat with resolutions parameters from zero to one. At a resolution of 0.1 we see the formation four main branches, one of which continues to split up to a resolution of 0.5. At higher resolutions we see only minor changes in the clusters formed. Seurat labels clusters according to their size with Cluster 0 being the largest."}
 pp <- clustree(pbmc)
 
 ggsave(here("figures/seurat_tree.png"), pp, width = 16, height = 10)
@@ -303,15 +310,14 @@ By adding this extra information we can quickly identify some of the cell types.
 CD19 (Figure \@ref(fig:seurat-genes)A) is a marker of B cells and is clearly
 expressed in the most distinct branch of the tree. CD14 (Figure
 \@ref(fig:seurat-genes)B) is a marker of one type of monocytes which becomes
-more expressed as we follow one of the central branches, allowing us which
-resolution identifies a pure population of these cells. CD3D (Figure
+more expressed as we follow one of the central branches, allowing us to see
+which resolution identifies a pure population of these cells. CD3D (Figure
 \@ref(fig:seurat-genes)C) is a general marker of T cells and is expressed in two
 separate branches, one which splits into low and high expression of CCR7 (Figure
-\@ref(fig:seurat-genes)D), separating memory and naive CD4 T cells. While there
-are alternative visualisations that can show differences in expression between
-clusters by adding this information to a clustering tree we can see if more
-populations can be identified as resolution is increased and if clusters are
-split in biologically sensible ways.
+\@ref(fig:seurat-genes)D), separating memory and naive CD4 T cells. By adding
+expression of known genes to a clustering tree we can see if more populations
+can be identified as resolution is increased and if clusters are split in
+biologically sensible ways.
 
 # Discussion and conclusion
 
@@ -322,11 +328,11 @@ a single cluster or sample at a time and may rely on prior knowledge of sample
 labels. Here we present clustering trees, an alternative visualisation that
 shows the relationships between clusterings at multiple resolutions.
 
-Clustering trees display how clusters are divided as resolution increases,
-which cluster are clearly separate and distinct, which are related to each other
-and how sample change as more clusters are produced. Although clustering trees
-can appear similar to the trees produced from hierarchical clustering there
-are several important difference. Hierarchical clustering considers the
+Clustering trees display how clusters are divided as resolution increases, which
+cluster are clearly separate and distinct, which are related to each other and
+how samples change groups as more clusters are produced. Although clustering
+trees can appear similar to the trees produced from hierarchical clustering
+there are several important difference. Hierarchical clustering considers the
 relationships between individual samples and doesn't provide an obvious way to
 form groups. In contrast clustering trees are independent of any particular
 clustering method and show the relationships between distinct groups, any of
@@ -343,9 +349,9 @@ Even when the number of clusters to choose is not a problem clustering trees can
 be a valuable tool. They provide a compact, information dense, visualisation
 that can display summarised information across a range of clusters. By modifying
 the appearance of cluster nodes based on attributes of the samples they
-represent clusterings can be evaluated and identities of clusters established.
-More experience with clustering trees may suggest other applications and they
-could be adapted to be more flexible, such as allowing fuzzy clusterings.
+represent, clusterings can be evaluated and identities of clusters established.
+In the future clustering trees could be adapted to be more flexible, such as
+accommodating fuzzy clusterings, and may have applications in other fields.
 
 # Methods
 
