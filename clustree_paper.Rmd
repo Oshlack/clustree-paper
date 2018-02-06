@@ -37,6 +37,7 @@ library("Matrix")
 # Plotting
 library("ggplot2")
 library("cowplot")
+library("ggraph")
 
 # Document
 library("here")
@@ -141,14 +142,45 @@ produced the clustering tree shown in Figure \@ref(fig:iris-tree)A.
 ```{r iris-tree, fig.cap = "Clustering trees based on $k$-means clustering of the iris dataset. In A nodes are coloured according to the value of $k$ and sized according to the number of samples they represent. Edges are coloured according to the number of samples (from blue representing few to yellow representing many) and the transparency adjusted according to the in-proportion, with stronger lines showing edges that are more important to the higher resolution cluster. Cluster labels are randomly assigned by the $k$-means algorithm. B shows the same tree with the node colouring changed to show the mean petal length of the samples in each cluster."}
 data("iris_clusts")
 
-p1 <- clustree(iris_clusts, prefix = "K")
+p1 <- clustree(iris_clusts, prefix = "K", node_size_range = c(10, 30),
+               node_text_size = 8, edge_width = 4) +
+    guides(size = guide_legend(title = "Cluster size", order = 1),
+           colour = guide_legend(title = "k",
+                                 keywidth = 5,
+                                 override.aes = list(size = 10),
+                                 order = 2),
+           edge_colour = guide_edge_colourbar(title = "Sample count",
+                                              barwidth = 3,
+                                              draw.ulim = TRUE,
+                                              draw.llim = TRUE,
+                                              order = 3),
+           edge_alpha = guide_legend(title = "In-proportion",
+                                     keywidth = 5,
+                                     order = 4)) +
+    theme(legend.title = element_text(size = 20),
+          legend.text = element_text(size = 15))
 p2 <- clustree(iris_clusts, prefix = "K", node_colour = "Petal.Length",
-               node_colour_aggr = mean) +
-    scale_colour_viridis_c(option = "plasma", begin = 0.3)
-panel <- plot_grid(p1, p2, labels = "AUTO")
+               node_colour_aggr = mean, node_size_range = c(10, 30),
+               node_text_size = 8, edge_width = 4) +
+    scale_colour_viridis_c(option = "plasma", begin = 0.3) +
+    guides(size = guide_legend(title = "Cluster size", order = 1),
+           colour = guide_colourbar(title = "Petal length",
+                                    barwidth = 3,
+                                    order = 2),
+           edge_colour = guide_edge_colourbar(title = "Sample count",
+                                              barwidth = 3,
+                                              draw.ulim = TRUE,
+                                              draw.llim = TRUE,
+                                              order = 3),
+           edge_alpha = guide_legend(title = "In-proportion",
+                                     keywidth = 5,
+                                     order = 4)) +
+    theme(legend.title = element_text(size = 20),
+          legend.text = element_text(size = 15))
+panel <- plot_grid(p1, p2, labels = "AUTO", label_size = 30)
 
-save_plot(here("figures/iris_tree.png"), panel, ncol = 2, base_height = 8)
-save_plot(here("figures/iris_tree.pdf"), panel, ncol = 2, base_height = 8)
+save_plot(here("figures/iris_tree.png"), panel, ncol = 2, base_height = 10)
+save_plot(here("figures/iris_tree.pdf"), panel, ncol = 2, base_height = 10)
 
 include_graphics(here("figures/iris_tree.png"))
 ```
