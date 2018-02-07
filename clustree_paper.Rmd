@@ -433,6 +433,27 @@ accommodating fuzzy clusterings, and may have applications in other fields.
 
 # Methods
 
+The clustree software package is built for the R statistical programming
+language. It relies on the ggraph package, which is itself built on the ggplot2
+and tidygraph packages.
+
+The Iris dataset is available as part of R. We clustered this dataset using the
+kmeans function in the stats package with values of $k$ from one to five. Each
+value of $k$ was clustered with a maximum of 100 iterations and with 10 random
+starting positions. The clustered Iris dataset is available as part of the
+clustree package.
+
+The PBMC dataset was downloaded from the Seurat tutorial page and this tutorial
+was followed for most of the analysis. Briefly cells were filtered based on the
+number of genes they express and the percentage of counts assigned to
+mitochondrial genes. The data was then log-normalised and 1838 variable genes
+identified. Potential confounding variables (number of unique molecular
+identifiers and percentage mitochondrial expression) were regressed from the
+dataset before performing principal component analysis on the identified
+variable genes. The first 10 principal components were then used to build a
+graph which was partitioned into clusters using resolution parameters in the
+range zero to one, in steps of 0.1.
+
 # Declarations
 
 ## Ethics
