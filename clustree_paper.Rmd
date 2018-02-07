@@ -55,7 +55,7 @@ range of applications. Typically the goal of clustering is to form groups where
 each sample is more similar to the other samples in the same group than to
 samples in other groups. While other forms of clustering exist, such as fuzzy or
 soft clustering where each sample is assigned to every cluster with some
-probability or hierarchical clustering which forms a tree of samples, most
+probability, or hierarchical clustering which forms a tree of samples, most
 methods form hard clusters where each sample is assigned to a single group.
 This goal can be achieved in a variety of ways, for example by considering the
 distances between sample, areas of density across the dataset or relationships
@@ -63,11 +63,12 @@ to statistical distributions.
 
 In many cases the number of groups that should be present in a dataset is not
 known in advance and deciding the correct number of clusters to use is a
-significant challenge. For some algorithms, such as $k$-means clustering, the
-number of clusters must be explicitly provided while other methods have
-parameters that, directly or indirectly, control the clustering resolution and
-therefore the number of clusters produced. While there are methods and
-statistics (such as the elbow method or silhouette) designed to help analysts
+significant challenge. For some algorithms, such as $k$-means clustering
+[@Forgy1965-oj, @Lloyd1982-bd], the number of clusters must be explicitly
+provided while other methods have parameters that, directly or indirectly,
+control the clustering resolution and therefore the number of clusters produced.
+While there are methods and statistics (such as the elbow method
+[@Thorndike1953-uv] or silhouette [@Rousseeuw1987-sm]) designed to help analysts
 decide which clustering resolution to use they typically produce a single score
 which only considers a single set of samples or clusters at a time.
 
@@ -130,14 +131,15 @@ attributes of samples in the clusters they represent.
 # A simple example
 
 To further illustrate how a clustering tree is built we will work through an
-example using the classical iris dataset. This dataset contains measurements of
-the sepal length, sepal width, petal length and petal width from 150 iris
-flowers, 50 from each of three species: _Iris setosa_, _Iris versicolor_ and
-_Iris virginica_. The iris dataset is commonly used as example for both
-clustering and classification problems with the _Iris setosa_ samples being
-significantly different to, and linearly separable from, the other samples. We
-have clustered this dataset using $k$-means clustering with $k = 1,...,5$ and
-produced the clustering tree shown in Figure \@ref(fig:iris-tree)A.
+example using the classical iris dataset [@Anderson1935-mt, @Fisher1936-wt].
+This dataset contains measurements of the sepal length, sepal width, petal
+length and petal width from 150 iris flowers, 50 from each of three species:
+_Iris setosa_, _Iris versicolor_ and _Iris virginica_. The iris dataset is
+commonly used as example for both clustering and classification problems with
+the _Iris setosa_ samples being significantly different to, and linearly
+separable from, the other samples. We have clustered this dataset using
+$k$-means clustering with $k = 1,...,5$ and produced the clustering tree shown
+in Figure \@ref(fig:iris-tree)A.
 
 ```{r iris-tree, fig.cap = "Clustering trees based on $k$-means clustering of the iris dataset. In A nodes are coloured according to the value of $k$ and sized according to the number of samples they represent. Edges are coloured according to the number of samples (from blue representing few to yellow representing many) and the transparency adjusted according to the in-proportion, with stronger lines showing edges that are more important to the higher resolution cluster. Cluster labels are randomly assigned by the $k$-means algorithm. B shows the same tree with the node colouring changed to show the mean petal length of the samples in each cluster."}
 data("iris_clusts")
@@ -221,33 +223,34 @@ particular clusters to split.
 One field that recently begun to make heavy use of clustering techniques is the
 analysis of single-cell RNA-sequencing (scRNA-seq) data. Single-cell
 RNA-sequencing is a recently developed technology that can measure how genes are
-expressed in thousands to millions of individual cells. This technology has been
-rapidly adopted in fields like developmental biology where it is valuable to
-have information from single cells rather than the measurements that are
-averaged across the many different cells in a sample using older RNA sequencing
-technologies. One of the key uses for scRNA-seq is to discover and interrogate
-the different cell types present in a sample of a complex tissue. In this
-situation clustering is typically used to group similar cells based on their
-gene expression and genes that are differentially expressed between groups are
-used to infer the identify or function of those cells. The number of cell types
-in an scRNA-seq dataset can vary depending on factors such as the tissue being
+expressed in thousands to millions of individual cells [@Tang2009-jd]. This
+technology has been rapidly adopted in fields like developmental biology and
+immunology where it is valuable to have information from single cells rather
+than the measurements that are averaged across the many different cells in a
+sample using older RNA sequencing technologies. One of the key uses for
+scRNA-seq is to discover and interrogate the different cell types present in a
+sample of a complex tissue. In this situation clustering is typically used to
+group similar cells based on their gene expression and genes that are
+differentially expressed between groups are used to infer the identify or
+function of those cells [@Stegle2015-mc]. The number of cell types in an
+scRNA-seq dataset can vary depending on factors such as the tissue being
 studied, it's developmental or environmental state and the number of cells
 captured. Often the number of cells types is not known before the data is
-generated and some samples can contin dozens of clusters. Therefore deciding
+generated and some samples can contain dozens of clusters. Therefore deciding
 which clustering resolution to use is an important consideration in this kind of
 analysis.
 
 As an example of how clustering trees can be used in the scRNA-seq context we
 present an example based on a commonly used Peripheral Blood Mononuclear Cell
 (PBMC) dataset. This dataset was originally produced by 10x Genomics and
-contains 2700 PBMCs representing a range of well-studied immune cell types. We
-have analysed this dataset using the Seurat package, a commonly used toolkit for
-scRNA-seq analysis, following the instructions in their tutorial with the
-exception of varying the clustering resolution parameter from zero to one (see
-methods). Seurat uses a graph-based clustering algorithm and the resolution
-parameter controls the partitioning of this graph, with higher values resulting
-in more clusters. The clustering tree produced from this analysis is shown in
-Figure \@ref(fig:seurat-tree).
+contains 2700 PBMCs representing a range of well-studied immune cell types
+[@Zheng2017-mm]. We have analysed this dataset using the Seurat package
+[@Satija2015-or], a commonly used toolkit for scRNA-seq analysis, following the
+instructions in their tutorial with the exception of varying the clustering
+resolution parameter from zero to one (see methods). Seurat uses a graph-based
+clustering algorithm and the resolution parameter controls the partitioning of
+this graph, with higher values resulting in more clusters. The clustering tree
+produced from this analysis is shown in Figure \@ref(fig:seurat-tree).
 
 ```{r seurat-load}
 pbmc_data <- Read10X(here("data"))
@@ -434,25 +437,30 @@ accommodating fuzzy clusterings, and may have applications in other fields.
 # Methods
 
 The clustree software package is built for the R statistical programming
-language. It relies on the ggraph package, which is itself built on the ggplot2
-and tidygraph packages.
+language. It relies on the ggraph package (https://github.com/thomasp85/ggraph),
+which is itself built on the ggplot2 [@Wickham2010-zq] and tidygraph packages
+(https://github.com/thomasp85/tidygraph). Clustering trees are displayed using
+the Reingold-Tilford tree layout [@Reingold1981-iy] available as part of the
+igraph package [@Csardi2006-ce].
 
-The Iris dataset is available as part of R. We clustered this dataset using the
+The iris dataset is available as part of R. We clustered this dataset using the
 kmeans function in the stats package with values of $k$ from one to five. Each
 value of $k$ was clustered with a maximum of 100 iterations and with 10 random
 starting positions. The clustered Iris dataset is available as part of the
 clustree package.
 
-The PBMC dataset was downloaded from the Seurat tutorial page and this tutorial
-was followed for most of the analysis. Briefly cells were filtered based on the
+The PBMC dataset was downloaded from the Seurat tutorial page
+(http://satijalab.org/seurat/pbmc3k_tutorial.html) and this tutorial was
+followed for most of the analysis. Briefly cells were filtered based on the
 number of genes they express and the percentage of counts assigned to
 mitochondrial genes. The data was then log-normalised and 1838 variable genes
 identified. Potential confounding variables (number of unique molecular
 identifiers and percentage mitochondrial expression) were regressed from the
 dataset before performing principal component analysis on the identified
 variable genes. The first 10 principal components were then used to build a
-graph which was partitioned into clusters using resolution parameters in the
-range zero to one, in steps of 0.1.
+graph which was partitioned into clusters using Louvain modularity optimisation
+[@Blondel2008-ym] with resolution parameters in the range zero to one, in steps
+of 0.1.
 
 # Declarations
 
