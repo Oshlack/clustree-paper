@@ -87,17 +87,18 @@ can be produced in R using our publicly available clustree package.
 # Building a clustering tree
 
 To build a clustering tree we start with a set of clusterings allocating samples
-to groups at different resolutions. These could be produced using any
+to groups at several different resolutions. These could be produced using any
 hard-clustering algorithm that allows control of the number of clusters in some
 way. For example this could be a set of samples clustered using $k$-means with
-$k = 1, 2, 3$ as shown in Figure \@ref(fig:algorithm). We then sort these
-clusterings so that they are ordered by increasing resolution (here that would
-be $k$), then consider pairs of adjacent clusterings. Each cluster ($c_i$) at a
-specific resolution ($k$) is compared with each cluster ($c_j$) in the next
-highest resolution ($k + 1$) and the overlap between the two clusters is
-computed as the number of samples that are assigned to both $c_i$ and $c_j$. We
-next build a graph where each node is a cluster and each edge is an overlap
-between clusters.
+$k = 1, 2, 3$ as shown in Figure \@ref(fig:algorithm). We sort these clusterings
+so that they are ordered by increasing resolution ($k$), then consider pairs of
+adjacent clusterings. Each cluster $c_{k,i}$ (where $n$ is the number of
+clusters at resolution $k$ and $i = 1,...,n$) is compared with each cluster
+$c_{k + 1,j}$ (where $m$ is the number of clusters at resolution $k + 1$ and $j =
+1,...,m$). The overlap between the two clusters is computed as the number of
+samples that are assigned to both $c_{k,i}$ and $c_{k + 1,j}$. We next build a
+graph where each node is a cluster and each edge is an overlap between two
+clusters.
 
 ```{r algorithm, fig.cap = "Illustration of the steps required to build a clustering tree. First a dataset must be clustered at different resolutions. A graph is then constructed with nodes representing clusters and edges showing the overlap in samples between them. Statistics are then calculated, edges filtered and the final graph visualised.", cache = FALSE}
 include_graphics(here("figures/algorithm.png"))
@@ -111,22 +112,21 @@ threshold number of samples to remove low-count edges. While this approach can
 be useful for removing edges from the graph it is often more informative to
 instead emphasise more important edges. In this case the count of samples is not
 the correct statistic to use as it naturally favours edges at lower resolutions
-and those connecting larger clusters. Instead we propose using the
-in-proportion, the ratio between the number of samples on the edge and the
-number of samples in the cluster it goes towards. This measure shows the
-importance of the edge to the higher resolution cluster, independently of the
-cluster size. We can apply a second threshold to this value in order to remove
-less important edges.
+and those connecting larger clusters. Instead we define the in-proportion metric
+as the ratio between the number of samples on the edge and the number of samples
+in the cluster it goes towards. This metric shows the importance of the edge to
+the higher resolution cluster, independently of the cluster size. We can apply a
+second threshold to this value in order to remove less important edges.
 
-We then visualise the final graph using a tree layout. This places the cluster
-nodes in a series of layers where each layer is a different clustering
-resolution and edges show the transition of samples through those resolutions.
-Edges are coloured according to the number of samples they represent and the in
-proportion is used to control the edge transparency, highlighting more important
-edges. By default, nodes are sized according to the size of the cluster they
-represent, with their colour indicating the resolution. The clustree package
-also includes options for controlling the aesthetics of nodes based on the
-attributes of samples in the clusters they represent.
+We visualise the final graph using a tree layout. This places the cluster nodes
+in a series of layers where each layer is a different clustering resolution and
+edges show the transition of samples through those resolutions. Edges are
+coloured according to the number of samples they represent and the in-proportion
+is used to control the edge transparency, highlighting more important edges. By
+default, nodes are sized according to the size of the cluster they represent,
+with their colour indicating the resolution. The clustree package also includes
+options for controlling the aesthetics of nodes based on the attributes of
+samples in the clusters they represent.
 
 # A simple example
 
@@ -218,7 +218,7 @@ species. We could potentially learn more by looking at which samples follow low
 proportion edges or overlaying a series of features to try and understand what
 particular clusters to split.
 
-# Clustering trees for scRNA-seq data
+# Clustering trees for single-cell RNA-seq data
 
 One field that recently begun to make heavy use of clustering techniques is the
 analysis of single-cell RNA-sequencing (scRNA-seq) data. Single-cell
@@ -237,20 +237,21 @@ scRNA-seq dataset can vary depending on factors such as the tissue being
 studied, it's developmental or environmental state and the number of cells
 captured. Often the number of cells types is not known before the data is
 generated and some samples can contain dozens of clusters. Therefore deciding
-which clustering resolution to use is an important consideration in this kind of
-analysis.
+which clustering resolution to use is an important consideration in this
+application.
 
 As an example of how clustering trees can be used in the scRNA-seq context we
 present an example based on a commonly used Peripheral Blood Mononuclear Cell
 (PBMC) dataset. This dataset was originally produced by 10x Genomics and
-contains 2700 PBMCs representing a range of well-studied immune cell types
-[@Zheng2017-mm]. We have analysed this dataset using the Seurat package
-[@Satija2015-or], a commonly used toolkit for scRNA-seq analysis, following the
-instructions in their tutorial with the exception of varying the clustering
-resolution parameter from zero to one (see methods). Seurat uses a graph-based
-clustering algorithm and the resolution parameter controls the partitioning of
-this graph, with higher values resulting in more clusters. The clustering tree
-produced from this analysis is shown in Figure \@ref(fig:seurat-tree).
+contains 2700 peripheral blood monocuclear cells, representing a range of
+well-studied immune cell types [@Zheng2017-mm]. We have analysed this dataset
+using the Seurat package [@Satija2015-or], a commonly used toolkit for scRNA-seq
+analysis, following the instructions in their tutorial with the exception of
+varying the clustering resolution parameter from zero to one (see methods).
+Seurat uses a graph-based clustering algorithm and the resolution parameter
+controls the partitioning of this graph, with higher values resulting in more
+clusters. The clustering tree produced from this analysis is shown in Figure
+\@ref(fig:seurat-tree).
 
 ```{r seurat-load}
 pbmc_data <- Read10X(here("data"))
@@ -327,17 +328,14 @@ resolution of 0.4. Most of the branching occurs in the branch starting with
 Cluster 1 which consistently has sub-branches split off to form new clusters as
 the resolution increases. There are two regions of stability in the tree; at
 resolution 0.5-0.6 and resolution 0.7-1.0 where the branch starting the Cluster
-0 splits in two. For most of the Seurat tutorial a resolution of 0.6 is used but
-the authors note that by moving to a resolution of 0.8 a split can be achieved
-between memory and naive CD4 T cells. This is a split that could be anticipated
-by looking at the clustering tree.
+0 splits in two.
 
-Known marker genes are commonly used to identify what cell types clusters
-correspond to. Overlaying gene expression onto a clustering tree is an
-alternative way to view this information and can help to show when clusters
+Known marker genes are commonly used to identify the cell types that sepecific
+clusters correspond to. Overlaying gene expression information onto a clustering
+tree provides an alternative view that can help to indicate when clusters
 containing pure cell populations are formed. Figure \@ref(fig:seurat-genes)
-shows the PBMC clustering tree overlaid with the expression of some known
-marker genes.
+shows the PBMC clustering tree overlaid with the expression of some known marker
+genes.
 
 ```{r seurat-genes, fig.cap = "Clustering trees of the PBMC dataset coloured according to the expression of known markers. CD19 (A) identifies B cells, CD14 (B) shows a population of monocytes, CD3D (C) is a marker of T cells and CCR7 (D) shows the split between memory and naive CD4 T cells."}
 
@@ -398,7 +396,10 @@ separate branches, one which splits into low and high expression of CCR7 (Figure
 \@ref(fig:seurat-genes)D), separating memory and naive CD4 T cells. By adding
 expression of known genes to a clustering tree we can see if more populations
 can be identified as resolution is increased and if clusters are split in
-biologically sensible ways.
+biologically sensible ways. For most of the Seurat tutorial a resolution of 0.6
+is used but the authors note that by moving to a resolution of 0.8 a split can
+be achieved between memory and naive CD4 T cells. This is a split that could be
+anticipated by looking at the clustering tree.
 
 # Discussion and conclusion
 
