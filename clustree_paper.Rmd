@@ -56,10 +56,11 @@ each sample is more similar to the other samples in the same group than to
 samples in other groups. While other forms of clustering exist, such as fuzzy or
 soft clustering where each sample is assigned to every cluster with some
 probability, or hierarchical clustering which forms a tree of samples, most
-methods form hard clusters where each sample is assigned to a single group.
-This goal can be achieved in a variety of ways, for example by considering the
-distances between sample, areas of density across the dataset or relationships
-to statistical distributions.
+methods form hard clusters where each sample is assigned to a single group. This
+goal can be achieved in a variety of ways, for example by considering the
+distances between sample ($k$-means [@Macqueen1967-ag], PAM [@Kaufman1990-mt]),
+areas of density across the dataset (DBSCAN [@Ester1996-da]) or relationships to
+statistical distributions [@Fraley2002-ps].
 
 In many cases the number of groups that should be present in a dataset is not
 known in advance and deciding the correct number of clusters to use is a
@@ -68,9 +69,9 @@ significant challenge. For some algorithms, such as $k$-means clustering
 provided while other methods have parameters that, directly or indirectly,
 control the clustering resolution and therefore the number of clusters produced.
 While there are methods and statistics (such as the elbow method
-[@Thorndike1953-uv] or silhouette [@Rousseeuw1987-sm]) designed to help analysts
-decide which clustering resolution to use they typically produce a single score
-which only considers a single set of samples or clusters at a time.
+[@Thorndike1953-uv] or silhouette plots [@Rousseeuw1987-sm]) designed to help
+analysts decide which clustering resolution to use they typically produce a
+single score which only considers a single set of samples or clusters at a time.
 
 An alternative approach would be to consider clusterings at multiple resolutions
 and look at how samples change groupings as the number of clusters increases.
@@ -337,7 +338,7 @@ containing pure cell populations are formed. Figure \@ref(fig:seurat-genes)
 shows the PBMC clustering tree overlaid with the expression of some known marker
 genes.
 
-```{r seurat-genes, fig.cap = "Clustering trees of the PBMC dataset coloured according to the expression of known markers. CD19 (A) identifies B cells, CD14 (B) shows a population of monocytes, CD3D (C) is a marker of T cells and CCR7 (D) shows the split between memory and naive CD4 T cells."}
+```{r seurat-genes, fig.cap = "Clustering trees of the PBMC dataset coloured according to the expression of known markers. The node colours indicate the average of the log_2_ gene counts of samples in each cluster. CD19 (A) identifies B cells, CD14 (B) shows a population of monocytes, CD3D (C) is a marker of T cells and CCR7 (D) shows the split between memory and naive CD4 T cells."}
 
 plots <- lapply(c("CD19", "CD14", "CD3D", "CCR7"), function(x) {
     clustree(pbmc, node_colour = x, node_colour_aggr = mean,
