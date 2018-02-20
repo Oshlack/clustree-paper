@@ -146,7 +146,7 @@ in Figure \@ref(fig:iris-tree)A.
 data("iris_clusts")
 
 p1 <- clustree(iris_clusts, prefix = "K", node_size_range = c(10, 30),
-               node_text_size = 8, edge_width = 4) +
+               node_text_size = 8, edge_width = 4, layout = "sugiyama") +
     guides(size = guide_legend(title = "Cluster size", order = 1),
            colour = guide_legend(title = "k",
                                  keywidth = 5,
@@ -164,7 +164,7 @@ p1 <- clustree(iris_clusts, prefix = "K", node_size_range = c(10, 30),
           legend.text = element_text(size = 15))
 p2 <- clustree(iris_clusts, prefix = "K", node_colour = "Petal.Length",
                node_colour_aggr = "mean", node_size_range = c(10, 30),
-               node_text_size = 8, edge_width = 4) +
+               node_text_size = 8, edge_width = 4, layout = "sugiyama") +
     scale_colour_viridis_c(option = "plasma", begin = 0.3) +
     guides(size = guide_legend(title = "Cluster size", order = 1),
            colour = guide_colourbar(title = "Petal length",
@@ -442,8 +442,9 @@ The clustree software package is built for the R statistical programming
 language. It relies on the ggraph package (https://github.com/thomasp85/ggraph),
 which is itself built on the ggplot2 [@Wickham2010-zq] and tidygraph packages
 (https://github.com/thomasp85/tidygraph). Clustering trees are displayed using
-the Reingold-Tilford tree layout [@Reingold1981-iy] available as part of the
-igraph package [@Csardi2006-ce].
+the Reingold-Tilford tree layout [@Reingold1981-iy] or the Sugiyama layout 
+[@Sugiyama1981-wu], both available as part of the igraph package
+[@Csardi2006-ce].
 
 The iris dataset is available as part of R. We clustered this dataset using the
 kmeans function in the stats package with values of $k$ from one to five. Each
