@@ -163,7 +163,7 @@ p1 <- clustree(iris_clusts, prefix = "K", node_size_range = c(10, 30),
     theme(legend.title = element_text(size = 20),
           legend.text = element_text(size = 15))
 p2 <- clustree(iris_clusts, prefix = "K", node_colour = "Petal.Length",
-               node_colour_aggr = mean, node_size_range = c(10, 30),
+               node_colour_aggr = "mean", node_size_range = c(10, 30),
                node_text_size = 8, edge_width = 4) +
     scale_colour_viridis_c(option = "plasma", begin = 0.3) +
     guides(size = guide_legend(title = "Cluster size", order = 1),
@@ -341,7 +341,7 @@ genes.
 ```{r seurat-genes, fig.cap = "Clustering trees of the PBMC dataset coloured according to the expression of known markers. The node colours indicate the average of the log_2_ gene counts of samples in each cluster. CD19 (A) identifies B cells, CD14 (B) shows a population of monocytes, CD3D (C) is a marker of T cells and CCR7 (D) shows the split between memory and naive CD4 T cells."}
 
 plots <- lapply(c("CD19", "CD14", "CD3D", "CCR7"), function(x) {
-    clustree(pbmc, node_colour = x, node_colour_aggr = mean,
+    clustree(pbmc, node_colour = x, node_colour_aggr = "mean",
              node_size_range = c(6, 20), node_text_size = 4,
              edge_width = 2.5) +
     scale_colour_viridis_c(option = "plasma", begin = 0.3) +
