@@ -346,7 +346,8 @@ plots <- lapply(c("CD19", "CD14", "CD3D", "CCR7"), function(x) {
              edge_width = 2.5) +
     scale_colour_viridis_c(option = "plasma", begin = 0.3) +
     guides(size = FALSE,
-           colour = guide_colourbar(barwidth = 2,
+           colour = guide_colourbar(title = x,
+                                    barwidth = 2,
                                     barheight = 30,
                                     order = 2),
            edge_colour = FALSE,
