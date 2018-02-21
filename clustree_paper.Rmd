@@ -288,15 +288,22 @@ pbmc <- ScaleData(object = pbmc, vars.to.regress = c("nUMI", "percent_mito"),
 ```{r seurat-cluster}
 pbmc <- RunPCA(object = pbmc, pc.genes = pbmc@var.genes, do.print = FALSE)
 pbmc <- FindClusters(object = pbmc, reduction.type = "pca", dims.use = 1:10,
-                     resolution = seq(0, 1, 0.1), print.output = FALSE)
+                     resolution = c(seq(0, 1, 0.1), seq(1.5, 5, 0.5)),
+                     print.output = FALSE)
 ```
 
 ```{r seurat-save}
 saveRDS(pbmc, here("output/pbmc_clustered.Rds"))
 ```
 
+```{r seurat-split}
+pbmc_lo <- pbmc
+pbmc_lo@meta.data <- pbmc_lo@meta.data[, paste0("res.", seq(0, 5, 0.5))]
+pbmc@meta.data <- pbmc@meta.data[, paste0("res.", seq(0, 1, 0.1))]
+```
+
 ```{r seurat-tree, fig.cap = "Clustering tree of a dataset of 2700 Peripheral Blood Mononuclear Cells (PBMCs) showing results from clustering using Seurat with resolutions parameters from zero to one. At a resolution of 0.1 we see the formation four main branches, one of which continues to split up to a resolution of 0.5. At higher resolutions we see only minor changes in the clusters formed. Seurat labels clusters according to their size with Cluster 0 being the largest."}
-pp <- clustree(pbmc, node_size_range = c(8, 25), node_text_size = 6,
+p1 <- clustree(pbmc, node_size_range = c(8, 25), node_text_size = 6,
                edge_width = 3) +
     guides(size = guide_legend(title = "Cluster size", order = 1),
            colour = guide_legend(title = "Resolution",
@@ -316,8 +323,30 @@ pp <- clustree(pbmc, node_size_range = c(8, 25), node_text_size = 6,
     theme(legend.title = element_text(size = 20),
           legend.text = element_text(size = 15))
 
-ggsave(here("figures/seurat_tree.png"), pp, width = 16, height = 12)
-ggsave(here("figures/seurat_tree.pdf"), pp, width = 16, height = 10)
+p2 <- clustree(pbmc_lo, node_size_range = c(8, 25), node_text_size = 6,
+               edge_width = 3) +
+    guides(size = guide_legend(title = "Cluster size", order = 1),
+           colour = guide_legend(title = "Resolution",
+                                 keywidth = 3,
+                                 override.aes = list(size = 10),
+                                 ncol = 2,
+                                 order = 2),
+           edge_colour = guide_edge_colourbar(title = "Sample count",
+                                              barwidth = 3,
+                                              draw.ulim = TRUE,
+                                              draw.llim = TRUE,
+                                              order = 3),
+           edge_alpha = guide_legend(title = "In-proportion",
+                                     keywidth = 5,
+                                     order = 4),
+           ncol = 2) +
+    theme(legend.title = element_text(size = 20),
+          legend.text = element_text(size = 15))
+
+panel <- plot_grid(p1, p2, labels = "AUTO", label_size = 30)
+
+ggsave(here("figures/seurat_tree.png"), panel, width = 16, height = 12)
+ggsave(here("figures/seurat_tree.pdf"), panel, width = 16, height = 10)
 
 include_graphics(here("figures/seurat_tree.png"))
 ```
