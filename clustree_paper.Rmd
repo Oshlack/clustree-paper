@@ -248,10 +248,10 @@ contains 2700 peripheral blood monocuclear cells, representing a range of
 well-studied immune cell types [@Zheng2017-mm]. We have analysed this dataset
 using the Seurat package [@Satija2015-or], a commonly used toolkit for scRNA-seq
 analysis, following the instructions in their tutorial with the exception of
-varying the clustering resolution parameter from zero to one (see methods).
+varying the clustering resolution parameter from zero to five (see methods).
 Seurat uses a graph-based clustering algorithm and the resolution parameter
 controls the partitioning of this graph, with higher values resulting in more
-clusters. The clustering tree produced from this analysis is shown in Figure
+clusters. The clustering trees produced from this analysis are shown in Figure
 \@ref(fig:seurat-tree).
 
 ```{r seurat-load}
@@ -302,7 +302,7 @@ pbmc_lo@meta.data <- pbmc_lo@meta.data[, paste0("res.", seq(0, 5, 0.5))]
 pbmc@meta.data <- pbmc@meta.data[, paste0("res.", seq(0, 1, 0.1))]
 ```
 
-```{r seurat-tree, fig.cap = "Clustering tree of a dataset of 2700 Peripheral Blood Mononuclear Cells (PBMCs) showing results from clustering using Seurat with resolutions parameters from zero to one. At a resolution of 0.1 we see the formation four main branches, one of which continues to split up to a resolution of 0.5. At higher resolutions we see only minor changes in the clusters formed. Seurat labels clusters according to their size with Cluster 0 being the largest."}
+```{r seurat-tree, fig.cap = "Two clustering trees of a dataset of 2700 Peripheral Blood Mononuclear Cells (PBMCs). A) show results from clustering using Seurat with resolution parameters from zero to one. At a resolution of 0.1 we see the formation four main branches, one of which continues to split up to a resolution of 0.5, after which there are only minor changes. B) shows resolutions from zero to five. At the highest resolutions we begin to see many low in-proportion edges indicating cluster instability. Seurat labels clusters according to their size with Cluster 0 being the largest."}
 p1 <- clustree(pbmc, node_size_range = c(8, 25), node_text_size = 6,
                edge_width = 3) +
     guides(size = guide_legend(title = "Cluster size", order = 1),
@@ -345,20 +345,30 @@ p2 <- clustree(pbmc_lo, node_size_range = c(8, 25), node_text_size = 6,
 
 panel <- plot_grid(p1, p2, labels = "AUTO", label_size = 30)
 
-ggsave(here("figures/seurat_tree.png"), panel, width = 16, height = 12)
-ggsave(here("figures/seurat_tree.pdf"), panel, width = 16, height = 10)
+ggsave(here("figures/seurat_tree.png"), panel, width = 28, height = 12)
+ggsave(here("figures/seurat_tree.pdf"), panel, width = 28, height = 12)
 
 include_graphics(here("figures/seurat_tree.png"))
 ```
 
-We see that four main branches quickly form in this tree at a resolution of just
-0.1. One of these branches, starting with Cluster 3 at resolution 0.1 remains
-unchanged while the branch starting with Cluster 2 splits only once at a
+Looking at Figure \@ref(fig:seurat-tree)A which shows resolutions from zero to
+one we see that four main branches quickly form in this tree at a resolution of 
+just 0.1. One of these branches, starting with Cluster 3 at resolution 0.1
+remains unchanged while the branch starting with Cluster 2 splits only once at a
 resolution of 0.4. Most of the branching occurs in the branch starting with
 Cluster 1 which consistently has sub-branches split off to form new clusters as
 the resolution increases. There are two regions of stability in the tree; at
 resolution 0.5-0.6 and resolution 0.7-1.0 where the branch starting the Cluster
 0 splits in two.
+
+Figure \@ref(fig:seurat-tree)B shows a clustering tree with a greater range of
+resolutions, from zero to five in steps of 0.5. By looking across this range we
+can see what happens when the algorithm is forced to produce more clusters than
+are likely to be truly present in this dataset. As over-clustering occurs we
+begin to see more low in-proportion edges and new clusters forming from multiple
+parent clusters. This suggests that those areas of the tree are unstable and
+that the new clusters being formed there are unlikely to represent true groups
+in the dataset.
 
 Known marker genes are commonly used to identify the cell types that sepecific
 clusters correspond to. Overlaying gene expression information onto a clustering
@@ -492,8 +502,8 @@ identifiers and percentage mitochondrial expression) were regressed from the
 dataset before performing principal component analysis on the identified
 variable genes. The first 10 principal components were then used to build a
 graph which was partitioned into clusters using Louvain modularity optimisation
-[@Blondel2008-ym] with resolution parameters in the range zero to one, in steps
-of 0.1.
+[@Blondel2008-ym] with resolution parameters in the range zero to five, in steps
+of 0.1 between zero and one and then in steps of 0.5.
 
 # Declarations
 
