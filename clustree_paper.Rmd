@@ -374,10 +374,10 @@ Known marker genes are commonly used to identify the cell types that sepecific
 clusters correspond to. Overlaying gene expression information onto a clustering
 tree provides an alternative view that can help to indicate when clusters
 containing pure cell populations are formed. Figure \@ref(fig:seurat-genes)
-shows the PBMC clustering tree overlaid with the expression of some known marker
-genes.
+shows the PBMC clustering tree in Figure \@ref(fig:seurat-tree)A overlaid with
+the expression of some known marker genes.
 
-```{r seurat-genes, fig.cap = "Clustering trees of the PBMC dataset coloured according to the expression of known markers. The node colours indicate the average of the log_2_ gene counts of samples in each cluster. CD19 (A) identifies B cells, CD14 (B) shows a population of monocytes, CD3D (C) is a marker of T cells and CCR7 (D) shows the split between memory and naive CD4 T cells."}
+```{r seurat-genes, fig.cap = "Clustering trees of the PBMC dataset coloured according to the expression of known markers. The node colours indicate the average of the log~2~ gene counts of samples in each cluster. CD19 (A) identifies B cells, CD14 (B) shows a population of monocytes, CD3D (C) is a marker of T cells and CCR7 (D) shows the split between memory and naive CD4 T cells."}
 
 plots <- lapply(c("CD19", "CD14", "CD3D", "CCR7"), function(x) {
     clustree(pbmc, node_colour = x, node_colour_aggr = "mean",
