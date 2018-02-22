@@ -101,23 +101,23 @@ samples that are assigned to both $c_{k,i}$ and $c_{k + 1,j}$. We next build a
 graph where each node is a cluster and each edge is an overlap between two
 clusters.
 
-```{r algorithm, fig.cap = "Illustration of the steps required to build a clustering tree. First a dataset must be clustered at different resolutions. A graph is then constructed with nodes representing clusters and edges showing the overlap in samples between them. Statistics are then calculated, edges filtered and the final graph visualised.", cache = FALSE}
-include_graphics(here("figures/algorithm.png"))
+```{r algorithm, fig.cap = "Illustration of the steps required to build a clustering tree. First a dataset must be clustered at different resolutions. The overlap in samples between clusters at adjacent resolutions is computed and used to calculate the in-proportion for each edge. Finally the edges are filtered and the graph visualised as a tree.", cache = FALSE}
+include_graphics(here("figures/algorithm2.png"))
 ```
 
 Many of the edges will be empty, for example in Figure \@ref(fig:algorithm) no
-samples in largest cluster at $k = 2$ end up in the smallest cluster at $k = 3$.
+samples in largest cluster at $k = 2$ end up in the last cluster at $k = 3$.
 In some datasets there may also be edges that contain few samples which are not
-informative and result in a cluttered tree. This is easily handled by setting a
-threshold number of samples to remove low-count edges. While this approach can
-be useful for removing edges from the graph it is often more informative to
-instead emphasise more important edges. In this case the count of samples is not
-the correct statistic to use as it naturally favours edges at lower resolutions
-and those connecting larger clusters. Instead we define the in-proportion metric
-as the ratio between the number of samples on the edge and the number of samples
-in the cluster it goes towards. This metric shows the importance of the edge to
-the higher resolution cluster, independently of the cluster size. We can apply a
-second threshold to this value in order to remove less important edges.
+informative and result in a cluttered tree. The solution to this problem is to
+remove some of the less important edges, with the obvious approach being to set
+a threshold number of samples to remove low-count edges. In this case the count
+of samples is not the correct statistic to use as it naturally favours edges at 
+lower resolutions and those connecting larger clusters. Instead we define the 
+in-proportion metric as the ratio between the number of samples on the edge and 
+the number of samples in the cluster it goes towards. This metric shows the 
+importance of the edge to the higher resolution cluster, independently of the 
+cluster size. We can apply a threshold to this value in order to remove less 
+important edges.
 
 We visualise the final graph using a tree layout. This places the cluster nodes
 in a series of layers where each layer is a different clustering resolution and
