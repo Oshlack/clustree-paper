@@ -46,20 +46,38 @@ library("knitr")
 
 # Abstract
 
+Clustering is widely used in the analysis of large data sets in order to group
+together samples with similar properties. For example, clustering is being
+widely used in the field of single-cell RNA-sequencing in order to identify
+different cell types present in a tissue sample. Although there are many
+algorithms to perform clustering the results can vary substantially. In
+particular, the number of clusters present in a data set is often unknown and
+can be varied based on parameters in the clustering algorithm. In order to
+explore and examine the impact of varying clustering resolutions we present
+clustering trees. This visualisation shows the relationships between clusters
+at multiple resolutions allowing researchers to see how samples move as the
+number of clusters increases. In addition, meta-information can be overlaid on
+the tree in order to inform the choice of resolution resolution and guide in
+identification of clusters. We illustrate the uses of clustering trees using
+two examples, the classical iris dataset and a complex single-cell
+RNA-sequencing dataset.
+
 # Keywords
+
+Clustering - Visualisation - scRNA-seq
 
 # Introduction
 
-Clustering analysis is commonly used to group similar samples for a diverse
+Clustering analysis is commonly used to group similar samples across a diverse
 range of applications. Typically, the goal of clustering is to form groups of
 samples that are more similar to each other than to samples in other groups.
 While other forms of clustering exist, such as fuzzy or soft clustering where
 each sample is assigned to every cluster with some probability, or hierarchical
 clustering which forms a tree of samples, most methods form hard clusters where
 each sample is assigned to a single group. This goal can be achieved in a
-variety of ways, for example by considering the distances between sample
-($k$-means [@Macqueen1967-ag], PAM [@Kaufman1990-mt]), areas of density across
-the dataset (DBSCAN [@Ester1996-da]) or relationships to statistical
+variety of ways, such as by considering the distances between sample (e.g.
+$k$-means [@Macqueen1967-ag], PAM [@Kaufman1990-mt]), areas of density across
+the dataset (e.g. DBSCAN [@Ester1996-da]) or relationships to statistical
 distributions [@Fraley2002-ps].
 
 In many cases the number of groups that should be present in a dataset is not
@@ -76,14 +94,15 @@ single score which only considers a single set of samples or clusters at a time.
 An alternative approach would be to consider clusterings at multiple
 resolutions and examine how samples change groupings as the number of clusters
 increases. This is the approach taken by the clustering tree visualisation we
-present here: (i) a dataset is clustered at multiple resolutions, (ii) the
-overlap between clusters at adjacent resolutions is used to build edges, (iii)
-the resulting graph is presented as a tree. This tree can be used to examine
-how clusters are related to each other, which clusters are distinct and which
-are unstable. In the following sections we describe how we construct such a
-tree and present examples of trees built from a classical clustering dataset
-and a complex single-cell RNA-sequencing (scRNA-seq) dataset. The figures shown
-here can be produced in R using our publicly available clustree package.
+present here: (i) a dataset is clustered at multiple resolutions producing sets
+of cluster nodes, (ii) the overlap between clusters at adjacent resolutions is
+used to build edges, (iii) the resulting graph is presented as a tree. This
+tree can be used to examine how clusters are related to each other, which
+clusters are distinct and which are unstable. In the following sections we
+describe how we construct such a tree and present examples of trees built from
+a classical clustering dataset and a complex single-cell RNA-sequencing
+(scRNA-seq) dataset. The figures shown here can be produced in R using our
+publicly available clustree package.
 
 # Building a clustering tree
 
@@ -110,24 +129,25 @@ samples in the largest cluster at $k = 2$ end up in the last cluster at $k =
 3$. In some datasets, there may also be edges that contain few samples. These
 edges are not informative and result in a cluttered tree. An obvious solution
 for removing uninformative, low-count edges is to filter them using a threshold
-on the number of samples they represent. However in this case the count of
-samples is not the correct statistic to use as it naturally favours edges at
-lower resolutions and those connecting larger clusters. Instead we define the
+on the number of samples they represent. However, in this case the count of
+samples is not the correct statistic to use because it favours edges at lower
+resolutions and those connecting larger clusters. Instead we define the
 in-proportion metric as the ratio between the number of samples on the edge and
 the number of samples in the cluster it goes towards. This metric shows the
 importance of the edge to the higher resolution cluster independently of the
-cluster size. We can apply a threshold to this value in order to remove less
+cluster size. We apply a threshold to the in-proportion in order to remove less
 informative edges.
 
-We visualise the final graph using a tree layout. This places the cluster nodes
-in a series of layers where each layer is a different clustering resolution and
-edges show the transition of samples through those resolutions. Edges are
-coloured according to the number of samples they represent and the
+The final graph is visualised using a tree layout. This places the cluster
+nodes in a series of layers where each layer is a different clustering
+resolution and edges show the transition of samples through those resolutions.
+Edges are coloured according to the number of samples they represent and the
 in-proportion metric is used to control the edge transparency, highlighting
-more important edges. By default, nodes are sized according to the size of the
-cluster they represent, with their colour indicating the resolution. The
-clustree package also includes options for controlling the aesthetics of nodes
-based on the attributes of samples in the clusters they represent.
+more important edges. By default, nodes are sized according to the number of
+samples in the cluster they represent, with their colour indicating the
+resolution. The clustree package also includes options for controlling the
+aesthetics of nodes based on the attributes of samples in the clusters they
+represent.
 
 # A simple example
 
@@ -231,14 +251,14 @@ than measurements that are averaged across the many different cells in a sample
 using older RNA sequencing technologies. One of the key uses for scRNA-seq is
 to discover and interrogate the different cell types present in a sample of a
 complex tissue. In this situation, clustering is typically used to group
-similar cells based on their gene expression. Differences in expression between
-groups can then be used to infer the identity or function of those cells
-[@Stegle2015-mc]. The number of cell types in an scRNA-seq dataset can vary
-depending on factors such as the tissue being studied, its developmental or
-environmental state and the number of cells captured. Often the number of cells
-types is not known before the data is generated and some samples can contain
-dozens of clusters. Therefore, deciding which clustering resolution to use is
-an important consideration in this application.
+similar cells based on their gene expression profiles. Differences in gene
+expression between groups can then be used to infer the identity or function of
+those cells [@Stegle2015-mc]. The number of cell types in an scRNA-seq dataset
+can vary depending on factors such as the tissue being studied, its
+developmental or environmental state and the number of cells captured. Often
+the number of cells types is not known before the data is generated and some
+samples can contain dozens of clusters. Therefore, deciding which clustering
+resolution to use is an important consideration in this application.
 
 As an example of how clustering trees can be used in the scRNA-seq context we
 consider commonly used Peripheral Blood Mononuclear Cell (PBMC) dataset. This
@@ -300,7 +320,7 @@ pbmc_lo@meta.data <- pbmc_lo@meta.data[, paste0("res.", seq(0, 5, 0.5))]
 pbmc@meta.data <- pbmc@meta.data[, paste0("res.", seq(0, 1, 0.1))]
 ```
 
-```{r seurat-tree, fig.cap = "Two clustering trees of a dataset of 2700 Peripheral Blood Mononuclear Cells (PBMCs). A) show results from clustering using Seurat with resolution parameters from zero to one. At a resolution of 0.1 we see the formation four main branches, one of which continues to split up to a resolution of 0.5, after which there are only minor changes. B) shows resolutions from zero to five. At the highest resolutions we begin to see many low in-proportion edges indicating cluster instability. Seurat labels clusters according to their size with Cluster 0 being the largest."}
+```{r seurat-tree, fig.cap = "Two clustering trees of a dataset of 2700 Peripheral Blood Mononuclear Cells (PBMCs). A) results from clustering using Seurat with resolution parameters from zero to one. At a resolution of 0.1 we see the formation four main branches, one of which continues to split up to a resolution of 0.5, after which there are only minor changes. B) resolutions from zero to five. At the highest resolutions we begin to see many low in-proportion edges indicating cluster instability. Seurat labels clusters according to their size with Cluster 0 being the largest."}
 p1 <- clustree(pbmc, node_size_range = c(8, 25), node_text_size = 6,
                edge_width = 3) +
     guides(size = guide_legend(title = "Cluster size", order = 1),
@@ -472,8 +492,8 @@ visualisation that can display summarised information across a range of
 clusters. By modifying the appearance of cluster nodes based on attributes of
 the samples they represent, clusterings can be evaluated and identities of
 clusters established. In the future clustering trees could be adapted to be
-more flexible, such as accommodating fuzzy clusterings, and may have
-applications in other fields.
+more flexible, such as accommodating fuzzy clusterings, and are likely to have
+applications in many fields.
 
 # Methods
 
