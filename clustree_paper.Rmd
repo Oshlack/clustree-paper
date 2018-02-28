@@ -125,18 +125,18 @@ include_graphics(here("figures/algorithm2.png"))
 ```
 
 Many of the edges will be empty, for example in Figure \@ref(fig:algorithm) no
-samples in the largest cluster at $k = 2$ end up in the last cluster at $k =
-3$. In some datasets, there may also be edges that contain few samples. These
-edges are not informative and result in a cluttered tree. An obvious solution
-for removing uninformative, low-count edges is to filter them using a threshold
-on the number of samples they represent. However, in this case the count of
-samples is not the correct statistic to use because it favours edges at lower
-resolutions and those connecting larger clusters. Instead we define the
-in-proportion metric as the ratio between the number of samples on the edge and
-the number of samples in the cluster it goes towards. This metric shows the
-importance of the edge to the higher resolution cluster independently of the
-cluster size. We apply a threshold to the in-proportion in order to remove less
-informative edges.
+samples in the Cluster A at $k = 2$ end up in Cluster B at $k = 3$. In some
+datasets, there may also be edges that contain few samples. These edges are not
+informative and result in a cluttered tree. An obvious solution for removing
+uninformative, low-count edges is to filter them using a threshold on the
+number of samples they represent. However, in this case the count of samples is
+not the correct statistic to use because it favours edges at lower resolutions
+and those connecting larger clusters. Instead we define the in-proportion
+metric as the ratio between the number of samples on the edge and the number of
+samples in the cluster it goes towards. This metric shows the importance of the
+edge to the higher resolution cluster independently of the cluster size. We
+apply a threshold to the in-proportion in order to remove less informative
+edges.
 
 The final graph is visualised using a tree layout. This places the cluster
 nodes in a series of layers where each layer is a different clustering
