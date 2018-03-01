@@ -523,7 +523,8 @@ The clustree package is available from GitHub at https://github.com/lazappi/clus
 analysis in this paper are available from
 https://github.com/Oshlack/clustree-paper. The clustered iris dataset is
 included as part of clustree and the PBMC dataset can be downloaded from the
-Seurat tutorial page (http://satijalab.org/seurat/pbmc3k_tutorial.html).
+Seurat tutorial page (http://satijalab.org/seurat/pbmc3k_tutorial.html) or the
+paper GitHub repository.
 
 ## Competing interests
 
