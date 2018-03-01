@@ -37,4 +37,4 @@ Style
 * `nature.csl` - Bibliography style file
 * `style.docx` - Reference DOCX style file
 * `style.Rmd` - Reference Rmd style file
-* `style_refs.bib` - Bibligraphy for the reference style
+* `style_refs.bib` - Bibliography for the reference style
