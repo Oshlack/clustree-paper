@@ -1,5 +1,5 @@
 ---
-title: "Clustering trees: a visualisation for evaluating clusterings at increasing resolutions"
+title: "Clustering trees: a visualisation for evaluating clusterings at multiple resolutions"
 author:
 - Luke Zappia (1, 2)
 - Alicia Oshlack (1, 2)
@@ -8,13 +8,22 @@ output:
     bookdown::word_document2:
         reference_docx: style/style.docx
         pandoc_args: [ "--csl", "style/nature.csl" ]
+    bookdown::pdf_document2:
+        toc: false
+        number_sections: false
+        pandoc_args: [ "--csl", "style/nature.csl" ]
+documentclass: article
+classoption: a4paper
 bibliography: style/references.bib
+abstract: "Clustering techniques are widely used in the analysis of large data sets to group together samples with similar properties. For example, clustering is often used in the field of single-cell RNA-sequencing in order to identify different cell types present in a tissue sample. There are many algorithms for performing clustering and the results can vary substantially. In particular, the number of groups present in a data set is often unknown and the number of clusters identified by an algorithm can change based on the parameters used. To explore and examine the impact of varying clustering resolution we present clustering trees. This visualisation shows the relationships between clusters at multiple resolutions allowing researchers to see how samples move as the number of clusters increases. In addition, meta-information can be overlaid on the tree to inform the choice of resolution and guide in identification of clusters. We illustrate the uses of clustering trees using two examples, the classical iris dataset and a complex single-cell RNA-sequencing dataset.\n\nKeywords: Clustering - Visualisation - scRNA-seq"
 ---
 
 ```{r setup, include = FALSE}
+FORMAT <- knitr::opts_knit$get('rmarkdown.pandoc.to')
+
 knitr::opts_chunk$set(autodep        = TRUE,
                       cache          = TRUE,
-                      cache.path     = "cache/",
+                      cache.path     = paste("cache/", FORMAT, "/"),
                       cache.comments = TRUE,
                       echo           = FALSE,
                       error          = FALSE,
@@ -44,45 +53,23 @@ library("here")
 library("knitr")
 ```
 
-# Abstract
-
-Clustering techniques are widely used in the analysis of large data sets to
-group together samples with similar properties. For example, clustering is
-being widely used in the field of single-cell RNA-sequencing in order to
-identify different cell types present in a tissue sample. There are many
-algorithms for performing clustering and the results can vary substantially. In
-particular, the number of groups present in a data set is often unknown and the
-number clusters identified by an algorithm can change based on the parameters
-used. To explore and examine the impact of varying clustering resolution we
-present clustering trees. This visualisation shows the relationships between
-clusters at multiple resolutions allowing researchers to see how samples move
-as the number of clusters increases. In addition, meta-information can be
-overlaid on the tree to inform the choice of resolution and guide in
-identification of clusters. We illustrate the uses of clustering trees using
-two examples, the classical iris dataset and a complex single-cell
-RNA-sequencing dataset.
-
-# Keywords
-
-Clustering - Visualisation - scRNA-seq
-
 # Introduction
 
 Clustering analysis is commonly used to group similar samples across a diverse
 range of applications. Typically, the goal of clustering is to form groups of
 samples that are more similar to each other than to samples in other groups.
-While fuzzy or soft clustering where assigns each sample to every cluster with
-some probability and hierarchical clustering forms a tree of samples, most
+While fuzzy or soft clustering assigns each sample to every cluster with
+some probability, and hierarchical clustering forms a tree of samples, most
 methods form hard clusters where each sample is assigned to a single group.
 This goal can be achieved in a variety of ways, such as by considering the
-distances between sample (e.g. $k$-means [@Forgy1965-oj, @Macqueen1967-ag,
+distances between sample (e.g. $k$-means [@Forgy1965-oj; @Macqueen1967-ag;
 @Lloyd1982-bd], PAM [@Kaufman1990-mt]), areas of density across the dataset
 (e.g. DBSCAN [@Ester1996-da]) or relationships to statistical distributions
 [@Fraley2002-ps].
 
 In many cases the number of groups that should be present in a dataset is not
 known in advance and deciding the correct number of clusters to use is a
-significant challenge. For some algorithms, such as $k$-means clustering the
+significant challenge. For some algorithms, such as $k$-means clustering, the
 number of clusters must be explicitly provided. Other methods have parameters
 that, directly or indirectly, control the clustering resolution and therefore
 the number of clusters produced. While there are methods and statistics (such
@@ -120,13 +107,13 @@ computed as the number of samples that are assigned to both $c_{k,i}$ and $c_{k
 + 1,j}$. We next build a graph where each node is a cluster and each edge is an
 overlap between two clusters.
 
-```{r algorithm, fig.cap = "- Illustration of the steps required to build a clustering tree. First a dataset must be clustered at different resolutions. The overlap in samples between clusters at adjacent resolutions is computed and used to calculate the in-proportion for each edge. Finally the edges are filtered and the graph visualised as a tree.", cache = FALSE}
+```{r algorithm, fig.cap = "Illustration of the steps required to build a clustering tree. First a dataset must be clustered at different resolutions. The overlap in samples between clusters at adjacent resolutions is computed and used to calculate the in-proportion for each edge. Finally the edges are filtered and the graph visualised as a tree.", cache = FALSE}
 include_graphics(here("figures/algorithm2.png"))
 ```
 
 Many of the edges will be empty, for example in Figure \@ref(fig:algorithm) no
-samples in the Cluster A at $k = 2$ end up in Cluster B at $k = 3$. In some
-datasets, there may also be edges that contain few samples. These edges are not
+samples in Cluster A at $k = 2$ end up in Cluster B at $k = 3$. In some
+datasets there may also be edges that contain few samples. These edges are not
 informative and result in a cluttered tree. An obvious solution for removing
 uninformative, low-count edges is to filter them using a threshold on the
 number of samples they represent. However, in this case the count of samples is
@@ -161,7 +148,7 @@ separable from, the other samples. We have clustered this dataset using
 $k$-means clustering with $k = 1,...,5$ and produced the clustering tree shown
 in Figure \@ref(fig:iris-tree)A.
 
-```{r iris-tree, fig.cap = "- Clustering trees based on $k$-means clustering of the iris dataset. In A, nodes are coloured according to the value of $k$ and sized according to the number of samples they represent. Edges are coloured according to the number of samples (from blue representing few to yellow representing many) and the transparency adjusted according to the in-proportion, with stronger lines showing edges that are more important to the higher resolution cluster. Cluster labels are randomly assigned by the $k$-means algorithm. B shows the same tree with the node colouring changed to show the mean petal length of the samples in each cluster."}
+```{r iris-tree, fig.cap = "Clustering trees based on $k$-means clustering of the iris dataset. In A, nodes are coloured according to the value of $k$ and sized according to the number of samples they represent. Edges are coloured according to the number of samples (from blue representing few to yellow representing many) and the transparency adjusted according to the in-proportion, with stronger lines showing edges that are more important to the higher resolution cluster. Cluster labels are randomly assigned by the $k$-means algorithm. B shows the same tree with the node colouring changed to show the mean petal length of the samples in each cluster."}
 data("iris_clusts")
 
 p1 <- clustree(iris_clusts, prefix = "K", node_size_range = c(10, 30),
@@ -319,7 +306,7 @@ pbmc_lo@meta.data <- pbmc_lo@meta.data[, paste0("res.", seq(0, 5, 0.5))]
 pbmc@meta.data <- pbmc@meta.data[, paste0("res.", seq(0, 1, 0.1))]
 ```
 
-```{r seurat-tree, fig.cap = "- Two clustering trees of a dataset of 2700 Peripheral Blood Mononuclear Cells (PBMCs). A) results from clustering using Seurat with resolution parameters from zero to one. At a resolution of 0.1 we see the formation of four main branches, one of which continues to split up to a resolution of 0.5, after which there are only minor changes. B) resolutions from zero to five. At the highest resolutions we begin to see many low in-proportion edges indicating cluster instability. Seurat labels clusters according to their size with Cluster 0 being the largest."}
+```{r seurat-tree, fig.cap = "Two clustering trees of a dataset of 2700 Peripheral Blood Mononuclear Cells (PBMCs). A) results from clustering using Seurat with resolution parameters from zero to one. At a resolution of 0.1 we see the formation of four main branches, one of which continues to split up to a resolution of 0.5, after which there are only minor changes. B) resolutions from zero to five. At the highest resolutions we begin to see many low in-proportion edges indicating cluster instability. Seurat labels clusters according to their size with Cluster 0 being the largest."}
 p1 <- clustree(pbmc, node_size_range = c(8, 25), node_text_size = 6,
                edge_width = 3) +
     guides(size = guide_legend(title = "Cluster size", order = 1),
@@ -375,7 +362,7 @@ remains unchanged while the branch starting with Cluster 2 splits only once at
 a resolution of 0.4. Most of the branching occurs in the branch starting with
 Cluster 1 which consistently has sub-branches split off to form new clusters as
 the resolution increases. There are two regions of stability in this tree; at
-resolution 0.5-0.6 and resolution 0.7-1.0 where the branch starting the Cluster
+resolution 0.5-0.6 and resolution 0.7-1.0 where the branch starting at Cluster
 0 splits in two.
 
 Figure \@ref(fig:seurat-tree)B shows a clustering tree with a greater range of
@@ -388,13 +375,14 @@ unstable and that the new clusters being formed are unlikely to represent true
 groups in the dataset.
 
 Known marker genes are commonly used to identify the cell types that specific
-clusters correspond to. Overlaying gene expression information onto a clustering
-tree provides an alternative view that can help to indicate when clusters
-containing pure cell populations are formed. Figure \@ref(fig:seurat-genes)
-shows the PBMC clustering tree in Figure \@ref(fig:seurat-tree)A overlaid with
-the expression of some known marker genes.
+clusters correspond to. Overlaying gene expression information onto a 
+clustering tree provides an alternative view that can help to indicate when 
+clusters containing pure cell populations are formed. Figure 
+\@ref(fig:seurat-genes) shows the PBMC clustering tree in Figure 
+\@ref(fig:seurat-tree)A overlaid with the expression of some known marker 
+genes.
 
-```{r seurat-genes, fig.cap = "- Clustering trees of the PBMC dataset coloured according to the expression of known markers. The node colours indicate the average of the log~2~ gene counts of samples in each cluster. CD19 (A) identifies B cells, CD14 (B) shows a population of monocytes, CD3D (C) is a marker of T cells and CCR7 (D) shows the split between memory and naive CD4 T cells."}
+```{r seurat-genes, fig.cap = "Clustering trees of the PBMC dataset coloured according to the expression of known markers. The node colours indicate the average of the log~2~ gene counts of samples in each cluster. CD19 (A) identifies B cells, CD14 (B) shows a population of monocytes, CD3D (C) is a marker of T cells and CCR7 (D) shows the split between memory and naive CD4 T cells."}
 
 plots <- lapply(c("CD19", "CD14", "CD3D", "CCR7"), function(x) {
     clustree(pbmc, node_colour = x, node_colour_aggr = "mean",
@@ -505,7 +493,7 @@ the Reingold-Tilford tree layout [@Reingold1981-iy] or the Sugiyama layout
 [@Csardi2006-ce].
 
 The iris dataset is available as part of R. We clustered this dataset using the
-kmeans function in the stats package with values of $k$ from one to five. Each
+"kmeans" function in the stats package with values of $k$ from one to five. Each
 value of $k$ was clustered with a maximum of 100 iterations and with 10 random
 starting positions. The clustered iris dataset is available as part of the
 clustree package.
@@ -531,8 +519,7 @@ Not applicable.
 
 ## Availability of data and materials
 
-The clustree package is available from our GitHub repository
-(https://github.com/Oshlack/clustree) and the code and datasets used for the
+The clustree package is available from GitHub at https://github.com/lazappi/clustree and the code and datasets used for the
 analysis in this paper are available from
 https://github.com/Oshlack/clustree-paper. The clustered iris dataset is
 included as part of clustree and the PBMC dataset can be downloaded from the
