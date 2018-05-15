@@ -1,3 +1,24 @@
+#' Get simulations
+#'
+#' Get a list of demonstration simulations
+#'
+#' @param ndim number of dimensions to simulate in each cluster
+#' @param nsamples number of samples to simulate
+#'
+#' @details The returned synthetic datasets are:
+#'
+#' 1. Random uniform noise
+#' 2. A single normally distributed cluster
+#' 3. Two clusters
+#' 4. Three clusters
+#' 5. Four clusters
+#'
+#' Each cluster contains `nsamples` points. Datasets with multiple clusters
+#' contain the previous dataset plus a new set of points, for example dataset 3
+#' contains all the points in dataset 2 plus another `nsamples` points in a new
+#' cluster.
+#'
+#' @return list of matrices
 get_sims <- function(ndim, nsamples) {
     set.seed(1)
     centre1 <- rnorm(ndim, sd = 10)
@@ -27,6 +48,14 @@ get_sims <- function(ndim, nsamples) {
     return(sims)
 }
 
+#' Cluster a simulation
+#'
+#' Cluster a simulation using kmeans with a range of ks
+#'
+#' @param sim simulated data matrix to cluster
+#' @param ks vector of k values to use for clustering
+#'
+#' @return matrix assiging samples to clusters at different k values
 cluster_sim <- function(sim, ks) {
     clusterings <- sapply(ks, function(k) {
         km <- kmeans(sim, centers = k, iter.max = 100, nstart = 10)
@@ -37,6 +66,16 @@ cluster_sim <- function(sim, ks) {
     return(clusterings)
 }
 
+
+#' Plot simulation PCA
+#'
+#' Produce a PCA plot of a simulation
+#'
+#' @param sim simulated data matrix
+#' @param ngroups number of clusters in the simulation
+#' @param group_size number of samples in each cluster
+#'
+#' @return ggplot object
 plot_sim_pca <- function(sim, ngroups = 0, group_size = NA) {
     pca <- as.data.frame(prcomp(sim)$x)
 
@@ -60,6 +99,15 @@ plot_sim_pca <- function(sim, ngroups = 0, group_size = NA) {
     return(gg)
 }
 
+
+#' Make simulation panel
+#'
+#' Produce the simulations panel shown in the paper
+#'
+#' @param sims list of simulated datasets
+#' @param clusts list of clustering matrices
+#'
+#' @return ggplot panel object
 make_sim_panel <- function(sims, clusts) {
 
     titles <- c("Uniform noise",
@@ -74,13 +122,13 @@ make_sim_panel <- function(sims, clusts) {
     })
 
     tree_plots <- lapply(clusts, function(x) {
-        clustree(x, prefix = "K") +
+        clustree::clustree(x, prefix = "K") +
             theme(legend.position = "none",
                   plot.margin = unit(c(1, 1, 1.5, 1.2), "cm"))
     })
 
     sc3_plots <- lapply(clusts, function(x) {
-        clustree(x, prefix = "K", node_colour = "sc3_stability") +
+        clustree::clustree(x, prefix = "K", node_colour = "sc3_stability") +
             scale_colour_viridis_c(option = "plasma", begin = 0.3,
                                    limits = c(0, 0.6)) +
             theme(legend.position = "none",
@@ -175,10 +223,11 @@ make_sim_panel <- function(sims, clusts) {
                                 rel_widths = c(1, 1.6, 1.6),
                                 rel_heights = c(1, 1, 1, 1, 1))
 
-    legend <- plot_grid(pca_legend, tree_legend, sc3_legend,
-                        ncol = 3, rel_widths = c(1, 1.6, 1.6))
+    legend <- cowplot::plot_grid(pca_legend, tree_legend, sc3_legend,
+                                 ncol = 3, rel_widths = c(1, 1.6, 1.6))
 
-    panel_legend <- plot_grid(panel, legend, nrow = 2, rel_heights = c(1, 0.05))
+    panel_legend <- cowplot::plot_grid(panel, legend,
+                                       nrow = 2, rel_heights = c(1, 0.05))
 
     return(panel_legend)
 }
