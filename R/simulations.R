@@ -206,6 +206,7 @@ p4_legend <- p4 +
     theme(legend.position = "bottom",
           legend.justification = "center",
           legend.title = element_text(size = 20))
+
 t0_legend <- t0 +
     guides(size = guide_legend(title = "Cluster size",
                                title.position = "top",
@@ -213,14 +214,15 @@ t0_legend <- t0 +
                                label.position = "top",
                                label.hjust = 0.5,
                                order = 1),
-           color = guide_legend(title.position = "top",
+           color = guide_legend(title = "k",
+                                title.position = "top",
                                 title.hjust = 0.5,
                                 override.aes = list(size = 8),
                                 order = 2),
            edge_colour = guide_edge_colourbar(title = "Sample count",
                                               title.position = "top",
                                               title.hjust = 0.5,
-                                              barwidth = 6,
+                                              barwidth = 8,
                                               barheight = 2.2,
                                               draw.ulim = TRUE,
                                               draw.llim = TRUE,
@@ -244,4 +246,170 @@ legend <- plot_grid(l1, l2, ncol = 2, rel_widths = c(1, 1.6))
 panel_legend <- plot_grid(panel, legend, nrow = 2, rel_heights = c(1, 0.05))
 
 save_plot("output/sim_panel.png", panel_legend, nrow = 6, ncol = 2,
+          base_width = 8, base_height = 6)
+
+
+# cluster_sim_dbscan <- function(sim, eps) {
+#     clusterings <- sapply(eps, function(x) {
+#         db <- dbscan::dbscan(sim, x)
+#         db$cluster
+#     })
+#     colnames(clusterings) <- paste0("Eps", eps)
+#
+#     sim_clusts <- data.frame(x = sim[, 1],
+#                              y = sim[, 2])
+#
+#     sim_clusts <- cbind(sim_clusts, clusterings)
+#
+#     return(sim_clusts)
+# }
+#
+# db0 <- clustree(cluster_sim_dbscan(sim0, seq(55, 65, 1)), prefix = "Eps") +
+#     theme(legend.position = "none",
+#           plot.margin = unit(c(1,1,1.5,1.2),"cm"))
+# db1 <- clustree(cluster_sim_dbscan(sim1, seq(0, 1, 0.1)), prefix = "Eps") +
+#     theme(legend.position = "none",
+#           plot.margin = unit(c(1,1,1.5,1.2),"cm"))
+# db2 <- clustree(cluster_sim_dbscan(sim2, seq(0, 1, 0.1)), prefix = "Eps") +
+#     theme(legend.position = "none",
+#           plot.margin = unit(c(1,1,1.5,1.2),"cm"))
+# db3 <- clustree(cluster_sim_dbscan(sim3, seq(0, 1, 0.1)), prefix = "Eps") +
+#     theme(legend.position = "none",
+#           plot.margin = unit(c(1,1,1.5,1.2),"cm"))
+# db4 <- clustree(cluster_sim_dbscan(sim4, seq(0, 1, 0.1)), prefix = "Eps") +
+#     theme(legend.position = "none",
+#           plot.margin = unit(c(1,1,1.5,1.2),"cm"))
+#
+# panel <- plot_grid(p0, db0, p1, db1, p2, db2, p3, db3, p4, db4, ncol = 2,
+#                    rel_widths = c(1, 1.6), rel_heights = c(1, 1, 1, 1, 1))
+# legend <- plot_grid(l1, l2, ncol = 2, rel_widths = c(1, 1.6))
+# panel_legend <- plot_grid(panel, legend, nrow = 2, rel_heights = c(1, 0.05))
+#
+# save_plot("output/sim_panel.png", panel_legend, nrow = 6, ncol = 2,
+#           base_width = 8, base_height = 6)
+
+# nsamples <- 1000
+# ndim <- 120
+#
+# points1 <- matrix(rnorm(ndim * nsamples, mean = 0, sd = 5), nsamples, ndim)
+# shift1A <- rnorm(20, mean = 20, sd = 10)
+# shift1B <- rnorm(20, mean = 20, sd = 10)
+# points1[, 1:20] <- points1[, 1:20] + shift1A
+# points1[, 21:40] <- points1[, 21:40] + shift1B
+#
+# points2 <- matrix(rnorm(ndim * nsamples, mean = 0, sd = 5), nsamples, ndim)
+# shift2B <- rnorm(20, mean = 10, sd = 10)
+# points2[, 1:20] <- points2[, 1:20] + shift1A
+# points2[, 41:60] <- points1[, 41:60] + shift2B
+#
+# points3 <- matrix(rnorm(ndim * nsamples, mean = 0, sd = 5), nsamples, ndim)
+# shift3A <- rnorm(20, mean = 20, sd = 10)
+# shift3B <- rnorm(20, mean = 20, sd = 10)
+# points3[, 61:80] <- points3[, 61:80] + shift3A
+# points3[, 81:100] <- points1[, 81:100] + shift3B
+#
+# points4 <- matrix(rnorm(ndim * nsamples, mean = 0, sd = 5), nsamples, ndim)
+# shift4B <- rnorm(10, mean = 10, sd = 10)
+# points4[, 61:80] <- points4[, 61:80] + shift3A
+# points4[, 101:120] <- points4[, 101:120] + shift4B
+#
+# sim4 <- rbind(points1, points2, points3, points4)
+# heatmap(sim4, Rowv = NA, Colv = NA,
+#         col = colorRampPalette(c('blue', 'white', 'red'))(100),
+#         scale = "none", labCol = FALSE, labRow = FALSE)
+
+
+# cluster_sim_mclust <- function(sim, G) {
+#     clusterings <- sapply(G, function(x) {
+#         mc <- mclust::Mclust(sim, x, modelNames = "EII")
+#         mc$classification
+#     })
+#     colnames(clusterings) <- paste0("G", G)
+#
+#     sim_clusts <- data.frame(x = sim[, 1],
+#                              y = sim[, 2])
+#
+#     sim_clusts <- cbind(sim_clusts, clusterings)
+#
+#     return(sim_clusts)
+# }
+#
+# cluster_sim_ms <- function(sim, h) {
+#     clusterings <- sapply(h, function(x) {
+#         mc <- MeanShift::msClustering(sim, h = x)
+#         mc$labels
+#     })
+#     colnames(clusterings) <- paste0("h", h)
+#
+#     sim_clusts <- data.frame(x = sim[, 1],
+#                              y = sim[, 2])
+#
+#     sim_clusts <- cbind(sim_clusts, clusterings)
+#
+#     return(sim_clusts)
+# }
+
+s0 <- clustree(clusts0, prefix = "K", node_colour = "sc3_stability") +
+    scale_colour_viridis_c(option = "plasma", begin = 0.3, limits = c(0, 0.6)) +
+    theme(legend.position = "none",
+          plot.margin = unit(c(1,1,1.5,1.2),"cm"))
+s1 <- clustree(clusts1, prefix = "K", node_colour = "sc3_stability") +
+    scale_colour_viridis_c(option = "plasma", begin = 0.3, limits = c(0, 0.6)) +
+    theme(legend.position = "none",
+          plot.margin = unit(c(1,1,1.5,1.2),"cm"))
+s2 <- clustree(clusts2, prefix = "K", node_colour = "sc3_stability") +
+    scale_colour_viridis_c(option = "plasma", begin = 0.3, limits = c(0, 0.6)) +
+    theme(legend.position = "none",
+          plot.margin = unit(c(1,1,1.5,1.2),"cm"))
+s3 <- clustree(clusts3, prefix = "K", node_colour = "sc3_stability") +
+    scale_colour_viridis_c(option = "plasma", begin = 0.3, limits = c(0, 0.6)) +
+    theme(legend.position = "none",
+          plot.margin = unit(c(1,1,1.5,1.2),"cm"))
+s4 <- clustree(clusts4, prefix = "K", node_colour = "sc3_stability") +
+    scale_colour_viridis_c(option = "plasma", begin = 0.3, limits = c(0, 0.6)) +
+    theme(legend.position = "none",
+          plot.margin = unit(c(1,1,1.5,1.2),"cm"))
+
+s0_legend <- s0 +
+    guides(size = guide_legend(title = "Cluster size",
+                               title.position = "top",
+                               title.hjust = 0.5,
+                               label.position = "top",
+                               label.hjust = 0.5,
+                               order = 1),
+           color = guide_colourbar(title = "SC3 stability",
+                                   title.position = "top",
+                                   title.hjust = 0.5,
+                                   barwidth = 8,
+                                   barheight = 2.2,
+                                   draw.ulim = TRUE,
+                                   draw.llim = TRUE,
+                                   order = 2),
+           edge_colour = guide_edge_colourbar(title = "Sample count",
+                                              title.position = "top",
+                                              title.hjust = 0.5,
+                                              barwidth = 8,
+                                              barheight = 2.2,
+                                              draw.ulim = TRUE,
+                                              draw.llim = TRUE,
+                                              order = 3),
+           edge_alpha = guide_legend(title = "In-proportion",
+                                     title.position = "top",
+                                     title.hjust = 0.5,
+                                     label.position = "top",
+                                     label.hjust = 0.5,
+                                     override.aes = list(size = 10),
+                                     order = 4)) +
+    theme(legend.position = "bottom",
+          legend.title = element_text(size = 20))
+
+l3 <- get_legend(s0_legend)
+
+panel <- plot_grid(p0, t0, s0, p1, t1, s1, p2, t2, s2, p3, t3, s3, p4, t4, s4,
+                   ncol = 3, rel_widths = c(1, 1.6, 1.6),
+                   rel_heights = c(1, 1, 1, 1, 1))
+legend <- plot_grid(l1, l2, l3, ncol = 3, rel_widths = c(1, 1.6, 1.6))
+panel_legend <- plot_grid(panel, legend, nrow = 2, rel_heights = c(1, 0.05))
+
+save_plot("output/sim_panel.png", panel_legend, nrow = 6, ncol = 3,
           base_width = 8, base_height = 6)
