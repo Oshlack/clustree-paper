@@ -53,6 +53,10 @@ library("here")
 library("knitr")
 ```
 
+```{r source, cache = FALSE}
+source(here("R/simulations.R"))
+```
+
 # Introduction
 
 Clustering analysis is commonly used to group similar samples across a diverse
@@ -134,6 +138,21 @@ more important edges. By default, the size of nodes is adjusted according to
 the number of samples in the cluster and their colour indicates the resolution.
 The clustree package also includes options for controlling the aesthetics of
 nodes based on the attributes of samples in the clusters they represent.
+
+# A demonstration using simulations
+
+```{r simulations, cache=F}
+sims <- get_sims(ndim = 100, nsamples = 1000)
+clusts <- lapply(sims, cluster_sim, ks = 1:8)
+sim_panel <- make_sim_panel(sims, clusts)
+
+save_plot(here("figures/simulations.png"), sim_panel, nrow = 6, ncol = 3,
+          base_width = 8, base_height = 6)
+save_plot(here("figures/simulations.pdf"), sim_panel, nrow = 6, ncol = 3,
+          base_width = 8, base_height = 6)
+
+include_graphics(here("figures/simulations.png"))
+```
 
 # A simple example
 

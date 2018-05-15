@@ -1,150 +1,44 @@
-set.seed(1)
+get_sims <- function(ndim, nsamples) {
+    set.seed(1)
+    centre1 <- rnorm(ndim, sd = 10)
+    shift2  <- rnorm(ndim, sd = 2)
+    centre2 <- centre1 + shift2
+    centre3 <- (centre1 + centre2) / 2 + rnorm(ndim, sd = 5)
+    centre4 <- centre3 + shift2 * 0.5 + rnorm(ndim, sd = 2)
 
-sim0 <- cbind(runif(1000, 0, 100), runif(1000, 0, 100))
-sim1 <- cbind(rnorm(1000, mean = 50, sd = 10), rnorm(1000, mean = 50, sd = 10))
-sim2 <- rbind(
-    cbind(rnorm(500, mean = 25, sd = 8), rnorm(500, mean = 50, sd = 8)),
-    cbind(rnorm(500, mean = 75, sd = 8), rnorm(500, mean = 50, sd = 8))
-)
-sim3 <- rbind(
-    cbind(rnorm(333, mean = 35, sd = 8), rnorm(333, mean = 75, sd = 8)),
-    cbind(rnorm(333, mean = 65, sd = 8), rnorm(333, mean = 75, sd = 8)),
-    cbind(rnorm(334, mean = 50, sd = 8), rnorm(334, mean = 25, sd = 8))
-)
-sim4 <- rbind(
-    cbind(rnorm(250, mean = 50, sd = 8), rnorm(250, mean = 75, sd = 8)),
-    cbind(rnorm(250, mean = 80, sd = 8), rnorm(250, mean = 75, sd = 8)),
-    cbind(rnorm(250, mean = 50, sd = 8), rnorm(250, mean = 25, sd = 8)),
-    cbind(rnorm(250, mean = 20, sd = 8), rnorm(250, mean = 25, sd = 8))
-)
+    points1 <- matrix(rnorm(ndim * nsamples, mean = centre1, sd = 5),
+                      nrow = nsamples, ncol = ndim, byrow = TRUE)
+    points2 <- matrix(rnorm(ndim * nsamples, mean = centre2, sd = 5),
+                      nrow = nsamples, ncol = ndim, byrow = TRUE)
+    points3 <- matrix(rnorm(ndim * nsamples, mean = centre3, sd = 5),
+                      nrow = nsamples, ncol = ndim, byrow = TRUE)
+    points4 <- matrix(rnorm(ndim * nsamples, mean = centre4, sd = 5),
+                      nrow = nsamples, ncol = ndim, byrow = TRUE)
 
-restrict_values <- function(x, min, max) {
-    x[x > max] <- max
-    x[x < min] <- min
+    sim0 <- matrix(runif(ndim * nsamples, 0, 10),
+                   nrow = nsamples, ncol = ndim, byrow = TRUE)
+    sim1 <- points1
+    sim2 <- rbind(points1, points2)
+    sim3 <- rbind(points1, points2, points3)
+    sim4 <- rbind(points1, points2, points3, points4)
 
-    return(x)
+    sims <- list(sim0, sim1, sim2, sim3, sim4)
+
+    return(sims)
 }
 
-sim0 <- restrict_values(sim0, 0, 100)
-sim1 <- restrict_values(sim1, 0, 100)
-sim2 <- restrict_values(sim2, 0, 100)
-sim3 <- restrict_values(sim3, 0, 100)
-sim4 <- restrict_values(sim4, 0, 100)
-
-add_noise <- function(sim) {
-    cbind(sim,
-          runif(1000, 0, 50), runif(1000, 0, 50),
-          runif(1000, 0, 50), runif(1000, 0, 50),
-          runif(1000, 0, 50), runif(1000, 0, 50),
-          runif(1000, 0, 50), runif(1000, 0, 50))
-}
-
-sim0 <- add_noise(sim0)
-sim1 <- add_noise(sim1)
-sim2 <- add_noise(sim2)
-sim3 <- add_noise(sim3)
-sim4 <- add_noise(sim4)
-
-cluster_sim <- function(sim, k) {
-    clusterings <- sapply(1:k, function(x) {
-        km <- kmeans(sim, centers = x, iter.max = 100, nstart = 10)
+cluster_sim <- function(sim, ks) {
+    clusterings <- sapply(ks, function(k) {
+        km <- kmeans(sim, centers = k, iter.max = 100, nstart = 10)
         km$cluster
     })
-    colnames(clusterings) <- paste0("K", 1:k)
+    colnames(clusterings) <- paste0("K", ks)
 
-    sim_clusts <- data.frame(x = sim[, 1],
-                             y = sim[, 2])
-
-    sim_clusts <- cbind(sim_clusts, clusterings)
-
-    return(sim_clusts)
+    return(clusterings)
 }
 
-clusts0 <- cluster_sim(sim0, 8)
-clusts1 <- cluster_sim(sim1, 8)
-clusts2 <- cluster_sim(sim2, 8)
-clusts3 <- cluster_sim(sim3, 8)
-clusts4 <- cluster_sim(sim4, 8)
-
-p0 <- ggplot(clusts0, aes(x = x, y = y)) + geom_point() +
-    scale_x_continuous(limits = c(0, 100)) +
-    scale_y_continuous(limits = c(0, 100)) +
-    theme_cowplot()
-p1 <- ggplot(clusts1, aes(x = x, y = y)) + geom_point() +
-    scale_x_continuous(limits = c(0, 100)) +
-    scale_y_continuous(limits = c(0, 100)) +
-    theme_cowplot()
-p2 <- ggplot(clusts2, aes(x = x, y = y)) + geom_point() +
-    scale_x_continuous(limits = c(0, 100)) +
-    scale_y_continuous(limits = c(0, 100)) +
-    theme_cowplot()
-p3 <- ggplot(clusts3, aes(x = x, y = y)) + geom_point() +
-    scale_x_continuous(limits = c(0, 100)) +
-    scale_y_continuous(limits = c(0, 100)) +
-    theme_cowplot()
-p4 <- ggplot(clusts4, aes(x = x, y = y)) + geom_point() +
-    scale_x_continuous(limits = c(0, 100)) +
-    scale_y_continuous(limits = c(0, 100)) +
-    theme_cowplot()
-
-t0 <- clustree(clusts0, prefix = "K")
-t1 <- clustree(clusts1, prefix = "K")
-t2 <- clustree(clusts2, prefix = "K")
-t3 <- clustree(clusts3, prefix = "K")
-t4 <- clustree(clusts4, prefix = "K")
-
-# ss <- cbind(sim4,
-#             runif(1000, 0, 50), runif(1000, 0, 50),
-#             runif(1000, 0, 50), runif(1000, 0, 50),
-#             runif(1000, 0, 50), runif(1000, 0, 50),
-#             runif(1000, 0, 50), runif(1000, 0, 50))
-# cc <- cluster_sim(ss, 8)
-# ggplot(cc, aes(x = x, y = y, colour = factor(K4))) + geom_point()
-# ggplot(cc, aes(x = x, y = y, colour = factor(K8))) + geom_point()
-#
-# clustree(cc, prefix = "K", prop_filter = 0.1)
-
-panel <- plot_grid(p0, t0, p1, t1, p2, t2, p3, t3, p4, t4, ncol = 2,
-                   rel_widths = c(1, 1.5))
-save_plot("output/sim_panel.png", panel, nrow = 5, ncol = 2,
-          base_width = 6, base_height = 4)
-
-
-ndim <- 100
-nsamples <- 1000
-
-set.seed(1)
-centre1 <- rnorm(ndim, sd = 10)
-shift2  <- rnorm(ndim, sd = 2)
-centre2 <- centre1 + shift2
-centre3 <- (centre1 + centre2) / 2 + rnorm(ndim, sd = 5)
-centre4 <- centre3 + shift2 * 0.5 + rnorm(ndim, sd = 2)
-
-points1 <- matrix(rnorm(ndim * nsamples, mean = centre1, sd = 5),
-                  nrow = nsamples, ncol = ndim, byrow = TRUE)
-points2 <- matrix(rnorm(ndim * nsamples, mean = centre2, sd = 5),
-                  nrow = nsamples, ncol = ndim, byrow = TRUE)
-points3 <- matrix(rnorm(ndim * nsamples, mean = centre3, sd = 5),
-                  nrow = nsamples, ncol = ndim, byrow = TRUE)
-points4 <- matrix(rnorm(ndim * nsamples, mean = centre4, sd = 5),
-                  nrow = nsamples, ncol = ndim, byrow = TRUE)
-
-sim0 <- matrix(runif(ndim * nsamples, 0, 10),
-               nrow = nsamples, ncol = ndim, byrow = TRUE)
-sim1 <- points1
-sim2 <- rbind(points1, points2)
-sim3 <- rbind(points1, points2, points3)
-sim4 <- rbind(points1, points2, points3, points4)
-
-clusts0 <- cluster_sim(sim0, 8)
-clusts1 <- cluster_sim(sim1, 8)
-clusts2 <- cluster_sim(sim2, 8)
-clusts3 <- cluster_sim(sim3, 8)
-clusts4 <- cluster_sim(sim4, 8)
-
-plot_sim_pca <- function(data, ngroups = 0, group_size = NA) {
-    pca <- as.data.frame(prcomp(data)$x)
-
+plot_sim_pca <- function(sim, ngroups = 0, group_size = NA) {
+    pca <- as.data.frame(prcomp(sim)$x)
 
     if (ngroups > 0) {
         pca$Group <- factor(rep(seq_len(ngroups), each = group_size))
@@ -159,257 +53,132 @@ plot_sim_pca <- function(data, ngroups = 0, group_size = NA) {
     }
 
     gg <- gg +
-        theme_cowplot() +
-        theme(legend.position = "none")
+        cowplot::theme_cowplot() +
+        theme(legend.position = "none",
+              plot.title = element_text(size = 30, hjust = -0.2))
 
     return(gg)
 }
 
-p0 <- plot_sim_pca(sim0) +
-    ggtitle("Uniform noise") +
-    theme(plot.title = element_text(size = 30, hjust = -0.2))
-p1 <- plot_sim_pca(sim1, 1, nsamples) +
-    ggtitle("Single cluster") +
-    theme(plot.title = element_text(size = 30, hjust = -0.2))
-p2 <- plot_sim_pca(sim2, 2, nsamples) +
-    ggtitle("Two clusters") +
-    theme(plot.title = element_text(size = 30, hjust = -0.2))
-p3 <- plot_sim_pca(sim3, 3, nsamples) +
-    ggtitle("Three clusters") +
-    theme(plot.title = element_text(size = 30, hjust = -0.2))
-p4 <- plot_sim_pca(sim4, 4, nsamples) +
-    ggtitle("Four clusters") +
-    theme(plot.title = element_text(size = 30, hjust = -0.2))
+make_sim_panel <- function(sims, clusts) {
 
-t0 <- clustree(clusts0, prefix = "K") +
-    theme(legend.position = "none",
-          plot.margin = unit(c(1,1,1.5,1.2),"cm"))
-t1 <- clustree(clusts1, prefix = "K") +
-    theme(legend.position = "none",
-          plot.margin = unit(c(1,1,1.5,1.2),"cm"))
-t2 <- clustree(clusts2, prefix = "K") +
-    theme(legend.position = "none",
-          plot.margin = unit(c(1,1,1.5,1.2),"cm"))
-t3 <- clustree(clusts3, prefix = "K") +
-    theme(legend.position = "none",
-          plot.margin = unit(c(1,1,1.5,1.2),"cm"))
-t4 <- clustree(clusts4, prefix = "K") +
-    theme(legend.position = "none",
-          plot.margin = unit(c(1,1,1.5,1.2),"cm"))
+    titles <- c("Uniform noise",
+                "Single cluster",
+                "Two clusters",
+                "Three clusters",
+                "Four clusters")
 
-p4_legend <- p4 +
-    guides(color = guide_legend(title.position = "top",
-                                title.hjust = 0.5,
-                                label.position = "top",
-                                label.hjust = 0.5,
-                                override.aes = list(size = 10))) +
-    theme(legend.position = "bottom",
-          legend.justification = "center",
-          legend.title = element_text(size = 20))
+    pca_plots <- lapply(seq_along(sims), function(x) {
+        plot_sim_pca(sims[[x]], ngroups = x - 1, group_size = nrow(sims[[1]])) +
+            ggtitle(titles[x])
+    })
 
-t0_legend <- t0 +
-    guides(size = guide_legend(title = "Cluster size",
-                               title.position = "top",
-                               title.hjust = 0.5,
-                               label.position = "top",
-                               label.hjust = 0.5,
-                               order = 1),
-           color = guide_legend(title = "k",
-                                title.position = "top",
-                                title.hjust = 0.5,
-                                override.aes = list(size = 8),
-                                order = 2),
-           edge_colour = guide_edge_colourbar(title = "Sample count",
-                                              title.position = "top",
-                                              title.hjust = 0.5,
-                                              barwidth = 8,
-                                              barheight = 2.2,
-                                              draw.ulim = TRUE,
-                                              draw.llim = TRUE,
-                                              order = 3),
-           edge_alpha = guide_legend(title = "In-proportion",
-                                     title.position = "top",
-                                     title.hjust = 0.5,
-                                     label.position = "top",
-                                     label.hjust = 0.5,
-                                     override.aes = list(size = 10),
-                                     order = 4)) +
-    theme(legend.position = "bottom",
-          legend.title = element_text(size = 20))
+    tree_plots <- lapply(clusts, function(x) {
+        clustree(x, prefix = "K") +
+            theme(legend.position = "none",
+                  plot.margin = unit(c(1, 1, 1.5, 1.2), "cm"))
+    })
 
-l1 <- get_legend(p4_legend)
-l2 <- get_legend(t0_legend)
+    sc3_plots <- lapply(clusts, function(x) {
+        clustree(x, prefix = "K", node_colour = "sc3_stability") +
+            scale_colour_viridis_c(option = "plasma", begin = 0.3,
+                                   limits = c(0, 0.6)) +
+            theme(legend.position = "none",
+                  plot.margin = unit(c(1,1,1.5,1.2),"cm"))
+    })
 
-panel <- plot_grid(p0, t0, p1, t1, p2, t2, p3, t3, p4, t4, ncol = 2,
-                   rel_widths = c(1, 1.6), rel_heights = c(1, 1, 1, 1, 1))
-legend <- plot_grid(l1, l2, ncol = 2, rel_widths = c(1, 1.6))
-panel_legend <- plot_grid(panel, legend, nrow = 2, rel_heights = c(1, 0.05))
+    pca_legend <- cowplot::get_legend(
+        pca_plots[[5]] +
+        guides(color = guide_legend(title.position = "top",
+                                    title.hjust = 0.5,
+                                    label.position = "top",
+                                    label.hjust = 0.5,
+                                    override.aes = list(size = 10))) +
+        theme(legend.position = "bottom",
+              legend.justification = "center",
+              legend.title = element_text(size = 20))
+    )
 
-save_plot("output/sim_panel.png", panel_legend, nrow = 6, ncol = 2,
-          base_width = 8, base_height = 6)
+    tree_legend <- cowplot::get_legend(
+        tree_plots[[1]] +
+            guides(size = guide_legend(title = "Cluster size",
+                                       title.position = "top",
+                                       title.hjust = 0.5,
+                                       label.position = "top",
+                                       label.hjust = 0.5,
+                                       order = 1),
+                   color = guide_legend(title = "k",
+                                        title.position = "top",
+                                        title.hjust = 0.5,
+                                        override.aes = list(size = 8),
+                                        order = 2),
+                   edge_colour = guide_edge_colourbar(title = "Sample count",
+                                                      title.position = "top",
+                                                      title.hjust = 0.5,
+                                                      barwidth = 8,
+                                                      barheight = 2.2,
+                                                      draw.ulim = TRUE,
+                                                      draw.llim = TRUE,
+                                                      order = 3),
+                   edge_alpha = guide_legend(title = "In-proportion",
+                                             title.position = "top",
+                                             title.hjust = 0.5,
+                                             label.position = "top",
+                                             label.hjust = 0.5,
+                                             override.aes = list(size = 10),
+                                             order = 4)) +
+            theme(legend.position = "bottom",
+                  legend.title = element_text(size = 20))
+    )
 
+    sc3_legend <- cowplot::get_legend(
+        sc3_plots[[1]] +
+            guides(size = guide_legend(title = "Cluster size",
+                                       title.position = "top",
+                                       title.hjust = 0.5,
+                                       label.position = "top",
+                                       label.hjust = 0.5,
+                                       order = 1),
+                   color = guide_colourbar(title = "SC3 stability",
+                                           title.position = "top",
+                                           title.hjust = 0.5,
+                                           barwidth = 8,
+                                           barheight = 2.2,
+                                           draw.ulim = TRUE,
+                                           draw.llim = TRUE,
+                                           order = 2),
+                   edge_colour = guide_edge_colourbar(title = "Sample count",
+                                                      title.position = "top",
+                                                      title.hjust = 0.5,
+                                                      barwidth = 8,
+                                                      barheight = 2.2,
+                                                      draw.ulim = TRUE,
+                                                      draw.llim = TRUE,
+                                                      order = 3),
+                   edge_alpha = guide_legend(title = "In-proportion",
+                                             title.position = "top",
+                                             title.hjust = 0.5,
+                                             label.position = "top",
+                                             label.hjust = 0.5,
+                                             override.aes = list(size = 10),
+                                             order = 4)) +
+            theme(legend.position = "bottom",
+                  legend.title = element_text(size = 20))
+    )
 
-# cluster_sim_dbscan <- function(sim, eps) {
-#     clusterings <- sapply(eps, function(x) {
-#         db <- dbscan::dbscan(sim, x)
-#         db$cluster
-#     })
-#     colnames(clusterings) <- paste0("Eps", eps)
-#
-#     sim_clusts <- data.frame(x = sim[, 1],
-#                              y = sim[, 2])
-#
-#     sim_clusts <- cbind(sim_clusts, clusterings)
-#
-#     return(sim_clusts)
-# }
-#
-# db0 <- clustree(cluster_sim_dbscan(sim0, seq(55, 65, 1)), prefix = "Eps") +
-#     theme(legend.position = "none",
-#           plot.margin = unit(c(1,1,1.5,1.2),"cm"))
-# db1 <- clustree(cluster_sim_dbscan(sim1, seq(0, 1, 0.1)), prefix = "Eps") +
-#     theme(legend.position = "none",
-#           plot.margin = unit(c(1,1,1.5,1.2),"cm"))
-# db2 <- clustree(cluster_sim_dbscan(sim2, seq(0, 1, 0.1)), prefix = "Eps") +
-#     theme(legend.position = "none",
-#           plot.margin = unit(c(1,1,1.5,1.2),"cm"))
-# db3 <- clustree(cluster_sim_dbscan(sim3, seq(0, 1, 0.1)), prefix = "Eps") +
-#     theme(legend.position = "none",
-#           plot.margin = unit(c(1,1,1.5,1.2),"cm"))
-# db4 <- clustree(cluster_sim_dbscan(sim4, seq(0, 1, 0.1)), prefix = "Eps") +
-#     theme(legend.position = "none",
-#           plot.margin = unit(c(1,1,1.5,1.2),"cm"))
-#
-# panel <- plot_grid(p0, db0, p1, db1, p2, db2, p3, db3, p4, db4, ncol = 2,
-#                    rel_widths = c(1, 1.6), rel_heights = c(1, 1, 1, 1, 1))
-# legend <- plot_grid(l1, l2, ncol = 2, rel_widths = c(1, 1.6))
-# panel_legend <- plot_grid(panel, legend, nrow = 2, rel_heights = c(1, 0.05))
-#
-# save_plot("output/sim_panel.png", panel_legend, nrow = 6, ncol = 2,
-#           base_width = 8, base_height = 6)
+    panel <- cowplot::plot_grid(pca_plots[[1]], tree_plots[[1]], sc3_plots[[1]],
+                                pca_plots[[2]], tree_plots[[2]], sc3_plots[[2]],
+                                pca_plots[[3]], tree_plots[[3]], sc3_plots[[3]],
+                                pca_plots[[4]], tree_plots[[4]], sc3_plots[[4]],
+                                pca_plots[[5]], tree_plots[[5]], sc3_plots[[5]],
+                                ncol = 3,
+                                rel_widths = c(1, 1.6, 1.6),
+                                rel_heights = c(1, 1, 1, 1, 1))
 
-# nsamples <- 1000
-# ndim <- 120
-#
-# points1 <- matrix(rnorm(ndim * nsamples, mean = 0, sd = 5), nsamples, ndim)
-# shift1A <- rnorm(20, mean = 20, sd = 10)
-# shift1B <- rnorm(20, mean = 20, sd = 10)
-# points1[, 1:20] <- points1[, 1:20] + shift1A
-# points1[, 21:40] <- points1[, 21:40] + shift1B
-#
-# points2 <- matrix(rnorm(ndim * nsamples, mean = 0, sd = 5), nsamples, ndim)
-# shift2B <- rnorm(20, mean = 10, sd = 10)
-# points2[, 1:20] <- points2[, 1:20] + shift1A
-# points2[, 41:60] <- points1[, 41:60] + shift2B
-#
-# points3 <- matrix(rnorm(ndim * nsamples, mean = 0, sd = 5), nsamples, ndim)
-# shift3A <- rnorm(20, mean = 20, sd = 10)
-# shift3B <- rnorm(20, mean = 20, sd = 10)
-# points3[, 61:80] <- points3[, 61:80] + shift3A
-# points3[, 81:100] <- points1[, 81:100] + shift3B
-#
-# points4 <- matrix(rnorm(ndim * nsamples, mean = 0, sd = 5), nsamples, ndim)
-# shift4B <- rnorm(10, mean = 10, sd = 10)
-# points4[, 61:80] <- points4[, 61:80] + shift3A
-# points4[, 101:120] <- points4[, 101:120] + shift4B
-#
-# sim4 <- rbind(points1, points2, points3, points4)
-# heatmap(sim4, Rowv = NA, Colv = NA,
-#         col = colorRampPalette(c('blue', 'white', 'red'))(100),
-#         scale = "none", labCol = FALSE, labRow = FALSE)
+    legend <- plot_grid(pca_legend, tree_legend, sc3_legend,
+                        ncol = 3, rel_widths = c(1, 1.6, 1.6))
 
+    panel_legend <- plot_grid(panel, legend, nrow = 2, rel_heights = c(1, 0.05))
 
-# cluster_sim_mclust <- function(sim, G) {
-#     clusterings <- sapply(G, function(x) {
-#         mc <- mclust::Mclust(sim, x, modelNames = "EII")
-#         mc$classification
-#     })
-#     colnames(clusterings) <- paste0("G", G)
-#
-#     sim_clusts <- data.frame(x = sim[, 1],
-#                              y = sim[, 2])
-#
-#     sim_clusts <- cbind(sim_clusts, clusterings)
-#
-#     return(sim_clusts)
-# }
-#
-# cluster_sim_ms <- function(sim, h) {
-#     clusterings <- sapply(h, function(x) {
-#         mc <- MeanShift::msClustering(sim, h = x)
-#         mc$labels
-#     })
-#     colnames(clusterings) <- paste0("h", h)
-#
-#     sim_clusts <- data.frame(x = sim[, 1],
-#                              y = sim[, 2])
-#
-#     sim_clusts <- cbind(sim_clusts, clusterings)
-#
-#     return(sim_clusts)
-# }
-
-s0 <- clustree(clusts0, prefix = "K", node_colour = "sc3_stability") +
-    scale_colour_viridis_c(option = "plasma", begin = 0.3, limits = c(0, 0.6)) +
-    theme(legend.position = "none",
-          plot.margin = unit(c(1,1,1.5,1.2),"cm"))
-s1 <- clustree(clusts1, prefix = "K", node_colour = "sc3_stability") +
-    scale_colour_viridis_c(option = "plasma", begin = 0.3, limits = c(0, 0.6)) +
-    theme(legend.position = "none",
-          plot.margin = unit(c(1,1,1.5,1.2),"cm"))
-s2 <- clustree(clusts2, prefix = "K", node_colour = "sc3_stability") +
-    scale_colour_viridis_c(option = "plasma", begin = 0.3, limits = c(0, 0.6)) +
-    theme(legend.position = "none",
-          plot.margin = unit(c(1,1,1.5,1.2),"cm"))
-s3 <- clustree(clusts3, prefix = "K", node_colour = "sc3_stability") +
-    scale_colour_viridis_c(option = "plasma", begin = 0.3, limits = c(0, 0.6)) +
-    theme(legend.position = "none",
-          plot.margin = unit(c(1,1,1.5,1.2),"cm"))
-s4 <- clustree(clusts4, prefix = "K", node_colour = "sc3_stability") +
-    scale_colour_viridis_c(option = "plasma", begin = 0.3, limits = c(0, 0.6)) +
-    theme(legend.position = "none",
-          plot.margin = unit(c(1,1,1.5,1.2),"cm"))
-
-s0_legend <- s0 +
-    guides(size = guide_legend(title = "Cluster size",
-                               title.position = "top",
-                               title.hjust = 0.5,
-                               label.position = "top",
-                               label.hjust = 0.5,
-                               order = 1),
-           color = guide_colourbar(title = "SC3 stability",
-                                   title.position = "top",
-                                   title.hjust = 0.5,
-                                   barwidth = 8,
-                                   barheight = 2.2,
-                                   draw.ulim = TRUE,
-                                   draw.llim = TRUE,
-                                   order = 2),
-           edge_colour = guide_edge_colourbar(title = "Sample count",
-                                              title.position = "top",
-                                              title.hjust = 0.5,
-                                              barwidth = 8,
-                                              barheight = 2.2,
-                                              draw.ulim = TRUE,
-                                              draw.llim = TRUE,
-                                              order = 3),
-           edge_alpha = guide_legend(title = "In-proportion",
-                                     title.position = "top",
-                                     title.hjust = 0.5,
-                                     label.position = "top",
-                                     label.hjust = 0.5,
-                                     override.aes = list(size = 10),
-                                     order = 4)) +
-    theme(legend.position = "bottom",
-          legend.title = element_text(size = 20))
-
-l3 <- get_legend(s0_legend)
-
-panel <- plot_grid(p0, t0, s0, p1, t1, s1, p2, t2, s2, p3, t3, s3, p4, t4, s4,
-                   ncol = 3, rel_widths = c(1, 1.6, 1.6),
-                   rel_heights = c(1, 1, 1, 1, 1))
-legend <- plot_grid(l1, l2, l3, ncol = 3, rel_widths = c(1, 1.6, 1.6))
-panel_legend <- plot_grid(panel, legend, nrow = 2, rel_heights = c(1, 0.05))
-
-save_plot("output/sim_panel.png", panel_legend, nrow = 6, ncol = 3,
-          base_width = 8, base_height = 6)
+    return(panel_legend)
+}
