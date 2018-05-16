@@ -175,7 +175,7 @@ distribution and each synthetic dataset has been clustered using $k$-means
 clustering with $k = 1,...,8$. When then use the clustree package to produce
 clustering trees for each dataset.
 
-```{r simulations}
+```{r simulations, fig.cap = "Five synthetic datasets used to demonstrate clustering trees. For each dataset a scatter plot of the first two principal components, a default clustering tree and and clustering tree with node coloured by the SC3 stability index are shown. The five datasets contain: A) random uniform noise, B) a single cluster, C) two clusters, D) three clusters and E) four clusters.}
 sims <- get_sims(ndim = 100, nsamples = 1000)
 clusts <- lapply(sims, cluster_sim, ks = 1:8)
 sim_panel <- make_sim_panel(sims, clusts)

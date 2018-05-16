@@ -110,11 +110,11 @@ plot_sim_pca <- function(sim, ngroups = 0, group_size = NA) {
 #' @return ggplot panel object
 make_sim_panel <- function(sims, clusts) {
 
-    titles <- c("Uniform noise",
-                "Single cluster",
-                "Two clusters",
-                "Three clusters",
-                "Four clusters")
+    titles <- c("A Uniform noise",
+                "B Single cluster",
+                "C Two clusters",
+                "D Three clusters",
+                "E Four clusters")
 
     pca_plots <- lapply(seq_along(sims), function(x) {
         plot_sim_pca(sims[[x]], ngroups = x - 1, group_size = nrow(sims[[1]])) +
