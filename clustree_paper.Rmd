@@ -84,16 +84,29 @@ single set of samples or clusters at a time.
 
 An alternative approach would be to consider clusterings at multiple
 resolutions and examine how samples change groupings as the number of clusters
-increases. This is the approach taken by the clustering tree visualisation we
-present here: (i) a dataset is clustered at multiple resolutions producing sets
-of cluster nodes, (ii) the overlap between clusters at adjacent resolutions is
-used to build edges, (iii) the resulting graph is presented as a tree. This
-tree can be used to examine how clusters are related to each other, which
-clusters are distinct and which are unstable. In the following sections we
-describe how we construct such a tree and present examples of trees built from
-a classical clustering dataset and a complex single-cell RNA-sequencing
-(scRNA-seq) dataset. The figures shown here can be produced in R using our
-publicly available clustree package.
+increases. This has lead to a range of cluster stability measures
+[@Von_Luxburg2010-zc], many of which rely on clustering of perturbed or
+sub-sampled datasets. For example, the model explorer algorithm sub-samples a
+dataset multiple times, clusters each sub-sampled dataset at various
+resolutions then calculates a similarity between clusterings at the same
+resolution to give a distribution of similarities which can inform the choice
+of resolution [@Ben-Hur2002-ha]. One cluster stability measure that isn't based
+on perturbations is that contained in the SC3 package for clustering
+single-cell RNA-sequencing data [@Kiselev2017-an]. Starting with a set of
+cluster labels at different resolutions each cluster is scored, with clusters
+awarded increased stability if they share the same samples as a cluster at
+another resolution but penalised if they are at a higher resolution.
+
+A similar simple approach is taken by the clustering tree visualisation we
+present here, without calculating scores: (i) a dataset is clustered at
+multiple resolutions producing sets of cluster nodes, (ii) the overlap between
+clusters at adjacent resolutions is used to build edges, (iii) the resulting
+graph is presented as a tree. This tree can be used to examine how clusters are
+related to each other, which clusters are distinct and which are unstable. In
+the following sections we describe how we construct such a tree and present
+examples of trees built from a classical clustering dataset and a complex
+single-cell RNA-sequencing (scRNA-seq) dataset. The figures shown here can be
+produced in R using our publicly available clustree package.
 
 # Building a clustering tree
 
