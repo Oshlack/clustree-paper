@@ -139,11 +139,23 @@ the number of samples in the cluster and their colour indicates the resolution.
 The clustree package also includes options for controlling the aesthetics of
 nodes based on the attributes of samples in the clusters they represent.
 
+While a clustering tree is conceptually similar to the tree produced through
+hierarchical clustering there are some important differences. The most obvious
+are that a hierarchical clustering tree is the result of a particular clustering
+algorithm and shows the relationships between individual samples while the
+clustering trees described here are independent of clustering method and show
+relationships between clusters. The branches of a hierarchical tree show how
+the clustering algorithm has merged samples. In contrast, edges in a clustering
+tree show how samples move between clusters as the resolution changes and nodes
+may have multiple parents. While it is possible to overlay information about
+samples on a hierarchical tree this is not commonly done but is a key feature of
+the clustree package and how clustering trees could be used in practice.
+
 # A demonstration using simulations
 
 To demonstrate what a clustering tree can look like in different situations and
 how it behaves as a dataset is over-clustered we present some illustrative
-examples using simple simulations. We present five scenarios: random uniform 
+examples using simple simulations. We present five scenarios: random uniform
 noise, a single cluster, two clusters, three clusters and four clusters. Each
 cluster consists of 1000 points generated from a 100 dimensional normal
 distribution and each synthetic dataset has been clustered using $k$-means
@@ -416,11 +428,11 @@ unstable and that the new clusters being formed are unlikely to represent true
 groups in the dataset.
 
 Known marker genes are commonly used to identify the cell types that specific
-clusters correspond to. Overlaying gene expression information onto a 
-clustering tree provides an alternative view that can help to indicate when 
-clusters containing pure cell populations are formed. Figure 
-\@ref(fig:seurat-genes) shows the PBMC clustering tree in Figure 
-\@ref(fig:seurat-tree)A overlaid with the expression of some known marker 
+clusters correspond to. Overlaying gene expression information onto a
+clustering tree provides an alternative view that can help to indicate when
+clusters containing pure cell populations are formed. Figure
+\@ref(fig:seurat-genes) shows the PBMC clustering tree in Figure
+\@ref(fig:seurat-tree)A overlaid with the expression of some known marker
 genes.
 
 ```{r seurat-genes, fig.cap = "Clustering trees of the PBMC dataset coloured according to the expression of known markers. The node colours indicate the average of the log~2~ gene counts of samples in each cluster. CD19 (A) identifies B cells, CD14 (B) shows a population of monocytes, CD3D (C) is a marker of T cells and CCR7 (D) shows the split between memory and naive CD4 T cells."}
