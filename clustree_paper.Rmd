@@ -53,6 +53,10 @@ library("here")
 library("knitr")
 ```
 
+```{r source, cache = FALSE}
+source(here("R/simulations.R"))
+```
+
 # Introduction
 
 Clustering analysis is commonly used to group similar samples across a diverse
@@ -62,7 +66,7 @@ While fuzzy or soft clustering assigns each sample to every cluster with
 some probability, and hierarchical clustering forms a tree of samples, most
 methods form hard clusters where each sample is assigned to a single group.
 This goal can be achieved in a variety of ways, such as by considering the
-distances between sample (e.g. $k$-means [@Forgy1965-oj; @Macqueen1967-ag;
+distances between samples (e.g. $k$-means [@Forgy1965-oj; @Macqueen1967-ag;
 @Lloyd1982-bd], PAM [@Kaufman1990-mt]), areas of density across the dataset
 (e.g. DBSCAN [@Ester1996-da]) or relationships to statistical distributions
 [@Fraley2002-ps].
@@ -134,6 +138,43 @@ more important edges. By default, the size of nodes is adjusted according to
 the number of samples in the cluster and their colour indicates the resolution.
 The clustree package also includes options for controlling the aesthetics of
 nodes based on the attributes of samples in the clusters they represent.
+
+# A demonstration using simulations
+
+To demonstrate what a clustering tree can look like in different situations and
+how it behaves as a dataset is over-clustered we present some illustrative
+examples using simple simulations. We present five scenarios: random uniform 
+noise, a single cluster, two clusters, three clusters and four clusters. Each
+cluster consists of 1000 points generated from a 100 dimensional normal
+distribution and each synthetic dataset has been clustered using $k$-means
+clustering with $k = 1,...,8$. When then use the clustree package to produce
+clustering trees for each dataset.
+
+```{r simulations}
+sims <- get_sims(ndim = 100, nsamples = 1000)
+clusts <- lapply(sims, cluster_sim, ks = 1:8)
+sim_panel <- make_sim_panel(sims, clusts)
+
+save_plot(here("figures/simulations.png"), sim_panel, nrow = 6, ncol = 3,
+          base_width = 8, base_height = 6)
+save_plot(here("figures/simulations.pdf"), sim_panel, nrow = 6, ncol = 3,
+          base_width = 8, base_height = 6)
+
+include_graphics(here("figures/simulations.png"))
+```
+
+Looking at the first two examples (uniform noise and a single cluster) we can
+clearly see how a clustering tree behaves when a clustering algorithm returns
+more clusters than are truly present in a dataset. New clusters begin to form
+from multiple existing clusters and many samples switch between branches of the
+tree resulting in low in-proportion edges. Although not shown here
+over-clustering with some algorithms may also cause clusters to appear then
+disappear as the resolution increases. As we add more structure to the datasets
+the clustering trees begin to form clear branches and low in-proportion edges
+tend to be confined to sections of the tree. By looking at which clusters are
+stable and where low in-proportion edges form we can infer which areas of the
+tree are likely to be the result of true cluster and which are caused by
+over-clustering.
 
 # A simple example
 
