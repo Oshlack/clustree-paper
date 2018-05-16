@@ -122,7 +122,10 @@ each cluster $c_{k + 1,j}$ (where $j = 1,...,m$ and $m$ is the number of
 clusters at resolution $k + 1$). The overlap between the two clusters is
 computed as the number of samples that are assigned to both $c_{k,i}$ and $c_{k
 + 1,j}$. We next build a graph where each node is a cluster and each edge is an
-overlap between two clusters.
+overlap between two clusters. While we refer to this graph as a tree in this
+paper for simplicity it can more correctly be described as a polytree, a
+special case of a directed acyclic graph where the underlying undirected graph
+is a tree [@Rebane2013-hn].
 
 ```{r algorithm, fig.cap = "Illustration of the steps required to build a clustering tree. First a dataset must be clustered at different resolutions. The overlap in samples between clusters at adjacent resolutions is computed and used to calculate the in-proportion for each edge. Finally the edges are filtered and the graph visualised as a tree.", cache = FALSE}
 include_graphics(here("figures/algorithm2.png"))
