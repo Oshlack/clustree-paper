@@ -142,10 +142,24 @@ edge to the higher resolution cluster independently of the cluster size. We
 apply a threshold to the in-proportion in order to remove less informative
 edges.
 
-The final graph is visualised using a tree layout. This places the cluster
-nodes in a series of layers where each layer is a different clustering
-resolution and edges show the transition of samples through those resolutions.
-Edges are coloured according to the number of samples they represent and the
+The final graph can then be visualised. In theory any graph layout algorithm
+could be used but for the clustree package we have made use of the two
+algorithms specifically designed for tree structures available in the igraph
+package [@Csardi2006-ce]. These are the Reingold-Tildord tree, layout which
+places parent nodes above their children [@Reingold1981-iy], and the Sugiyama
+layout which places nodes of a directed acyclic graph in layers while minimising
+the number of crossing edges [@Sugiyama1981-wu]. Both of these algorithms can
+produce attractive layouts and as such we have not found the need to design a
+specific layout algorithm for clustering trees. By default the clustree package
+uses only a subset of edges when constructing a layout, specifically the highest
+in-proportion edges for each node. We have found that this often leads to more
+interpretable visualisations, however users can choose to use all edges if
+desired.
+
+Whichever layout is used the final visualisation places the cluster nodes in a
+series of layers where each layer is a different clustering resolution and
+edges show the transition of samples through those resolutions. Edges are
+coloured according to the number of samples they represent and the
 in-proportion metric is used to control the edge transparency, highlighting
 more important edges. By default, the size of nodes is adjusted according to
 the number of samples in the cluster and their colour indicates the resolution.
@@ -568,9 +582,8 @@ The clustree software package is built for the R statistical programming
 language. It relies on the ggraph package (https://github.com/thomasp85/ggraph),
 which is itself built on the ggplot2 [@Wickham2010-zq] and tidygraph packages
 (https://github.com/thomasp85/tidygraph). Clustering trees are displayed using
-the Reingold-Tilford tree layout [@Reingold1981-iy] or the Sugiyama layout
-[@Sugiyama1981-wu], both available as part of the igraph package
-[@Csardi2006-ce].
+the Reingold-Tilford tree layout or the Sugiyama layout, both available as part
+of the igraph package.
 
 The iris dataset is available as part of R. We clustered this dataset using the
 "kmeans" function in the stats package with values of $k$ from one to five. Each
