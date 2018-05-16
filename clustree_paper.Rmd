@@ -175,7 +175,7 @@ distribution and each synthetic dataset has been clustered using $k$-means
 clustering with $k = 1,...,8$. When then use the clustree package to produce
 clustering trees for each dataset.
 
-```{r simulations, fig.cap = "Five synthetic datasets used to demonstrate clustering trees. For each dataset a scatter plot of the first two principal components, a default clustering tree and and clustering tree with node coloured by the SC3 stability index are shown. The five datasets contain: A) random uniform noise, B) a single cluster, C) two clusters, D) three clusters and E) four clusters.}
+```{r simulations, fig.cap = "Five synthetic datasets used to demonstrate clustering trees. For each dataset a scatter plot of the first two principal components, a default clustering tree and and clustering tree with node coloured by the SC3 stability index, from purple (lowest) to yellow (highest), are shown. The five datasets contain: A) random uniform noise, B) a single cluster, C) two clusters, D) three clusters and E) four clusters."}
 sims <- get_sims(ndim = 100, nsamples = 1000)
 clusts <- lapply(sims, cluster_sim, ks = 1:8)
 sim_panel <- make_sim_panel(sims, clusts)
@@ -200,6 +200,20 @@ tend to be confined to sections of the tree. By looking at which clusters are
 stable and where low in-proportion edges form we can infer which areas of the
 tree are likely to be the result of true cluster and which are caused by
 over-clustering.
+
+The second clustering tree for each dataset shows nodes coloured according to
+the SC3 stability index for each cluster. As we would expect in the first two
+examples no cluster receives a high stability score. However, while we clearly
+see two branches in the clustering tree for the two cluster example this is
+not reflected in the SC3 scores. No cluster receives a high stability score,
+most likely due to the high number of samples moving between clusters as the
+resolution increases. As there are more true clusters in the simulated datasets
+the SC3 stability scores become more predictive of the correct resolution to
+use, however it is important to look at the stability scores of all clusters at
+a particular resolution as taking the highest individual cluster stability score
+could lead to the incorrect resolution being used, as can be seen in the four
+cluster example. These examples show how clustering trees can be used to display
+existing clustering metrics in a way that can help to inform parameter choices.
 
 # A simple example
 
