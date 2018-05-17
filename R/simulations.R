@@ -48,6 +48,7 @@ get_sims <- function(ndim, nsamples) {
     return(sims)
 }
 
+
 #' Cluster a simulation
 #'
 #' Cluster a simulation using kmeans with a range of ks
@@ -110,11 +111,11 @@ plot_sim_pca <- function(sim, ngroups = 0, group_size = NA) {
 #' @return ggplot panel object
 make_sim_panel <- function(sims, clusts) {
 
-    titles <- c("A Uniform noise",
-                "B Single cluster",
-                "C Two clusters",
-                "D Three clusters",
-                "E Four clusters")
+    titles <- c("A - Uniform noise",
+                "B - Single cluster",
+                "C - Two clusters",
+                "D - Three clusters",
+                "E - Four clusters")
 
     pca_plots <- lapply(seq_along(sims), function(x) {
         plot_sim_pca(sims[[x]], ngroups = x - 1, group_size = nrow(sims[[1]])) +
@@ -122,17 +123,22 @@ make_sim_panel <- function(sims, clusts) {
     })
 
     tree_plots <- lapply(clusts, function(x) {
-        clustree::clustree(x, prefix = "K") +
+        clustree::clustree(x, prefix = "K", node_size_range = c(10, 20),
+                           node_text_size = 8) +
+            expand_limits(y = 7.2) +
             theme(legend.position = "none",
                   plot.margin = unit(c(1, 1, 1.5, 1.2), "cm"))
     })
 
     sc3_plots <- lapply(clusts, function(x) {
-        clustree::clustree(x, prefix = "K", node_colour = "sc3_stability") +
+        clustree::clustree(x, prefix = "K", node_size_range = c(10, 20),
+                           node_text_size = 8,
+                           node_colour = "sc3_stability") +
             scale_colour_viridis_c(option = "plasma", begin = 0.3,
                                    limits = c(0, 0.6)) +
+            expand_limits(y = 7.2) +
             theme(legend.position = "none",
-                  plot.margin = unit(c(1,1,1.5,1.2),"cm"))
+                  plot.margin = unit(c(1, 1, 1.5, 1.2), "cm"))
     })
 
     pca_legend <- cowplot::get_legend(
@@ -176,41 +182,25 @@ make_sim_panel <- function(sims, clusts) {
                                              override.aes = list(size = 10),
                                              order = 4)) +
             theme(legend.position = "bottom",
+                  legend.justification = "center",
                   legend.title = element_text(size = 20))
     )
 
     sc3_legend <- cowplot::get_legend(
         sc3_plots[[1]] +
-            guides(size = guide_legend(title = "Cluster size",
-                                       title.position = "top",
-                                       title.hjust = 0.5,
-                                       label.position = "top",
-                                       label.hjust = 0.5,
-                                       order = 1),
+            guides(size = FALSE,
                    color = guide_colourbar(title = "SC3 stability",
                                            title.position = "top",
                                            title.hjust = 0.5,
-                                           barwidth = 8,
+                                           barwidth = 30,
                                            barheight = 2.2,
                                            draw.ulim = TRUE,
                                            draw.llim = TRUE,
                                            order = 2),
-                   edge_colour = guide_edge_colourbar(title = "Sample count",
-                                                      title.position = "top",
-                                                      title.hjust = 0.5,
-                                                      barwidth = 8,
-                                                      barheight = 2.2,
-                                                      draw.ulim = TRUE,
-                                                      draw.llim = TRUE,
-                                                      order = 3),
-                   edge_alpha = guide_legend(title = "In-proportion",
-                                             title.position = "top",
-                                             title.hjust = 0.5,
-                                             label.position = "top",
-                                             label.hjust = 0.5,
-                                             override.aes = list(size = 10),
-                                             order = 4)) +
+                   edge_colour = FALSE,
+                   edge_alpha = FALSE) +
             theme(legend.position = "bottom",
+                  legend.justification = "center",
                   legend.title = element_text(size = 20))
     )
 
@@ -220,11 +210,11 @@ make_sim_panel <- function(sims, clusts) {
                                 pca_plots[[4]], tree_plots[[4]], sc3_plots[[4]],
                                 pca_plots[[5]], tree_plots[[5]], sc3_plots[[5]],
                                 ncol = 3,
-                                rel_widths = c(1, 1.6, 1.6),
+                                rel_widths = c(1, 1.2, 1.2),
                                 rel_heights = c(1, 1, 1, 1, 1))
 
     legend <- cowplot::plot_grid(pca_legend, tree_legend, sc3_legend,
-                                 ncol = 3, rel_widths = c(1, 1.6, 1.6))
+                                 ncol = 3, rel_widths = c(1, 1.2, 1.2))
 
     panel_legend <- cowplot::plot_grid(panel, legend,
                                        nrow = 2, rel_heights = c(1, 0.05))

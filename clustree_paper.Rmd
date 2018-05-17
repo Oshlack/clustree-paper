@@ -195,9 +195,12 @@ distribution and each synthetic dataset has been clustered using $k$-means
 clustering with $k = 1,...,8$. We then use the clustree package to produce
 clustering trees for each dataset (Figure \@ref(fig:simulations)).
 
-```{r simulations, fig.cap = "Five synthetic datasets used to demonstrate clustering trees. For each dataset a scatter plot of the first two principal components, a default clustering tree and and clustering tree with node coloured by the SC3 stability index, from purple (lowest) to yellow (highest), are shown. The five datasets contain: A) random uniform noise, B) a single cluster, C) two clusters, D) three clusters and E) four clusters."}
+```{r get-sims}
 sims <- get_sims(ndim = 100, nsamples = 1000)
 clusts <- lapply(sims, cluster_sim, ks = 1:8)
+```
+
+```{r simulations, fig.cap = "Five synthetic datasets used to demonstrate clustering trees. For each dataset a scatter plot of the first two principal components, a default clustering tree and and clustering tree with nodes coloured by the SC3 stability index from purple (lowest) to yellow (highest) are shown. The five datasets contain: A) random uniform noise, B) a single cluster, C) two clusters, D) three clusters and E) four clusters.", cache = FALSE}
 sim_panel <- make_sim_panel(sims, clusts)
 
 save_plot(here("figures/simulations.png"), sim_panel, nrow = 6, ncol = 3,
@@ -267,6 +270,7 @@ p1 <- clustree(iris_clusts, prefix = "K", node_size_range = c(10, 30),
            edge_alpha = guide_legend(title = "In-proportion",
                                      keywidth = 5,
                                      order = 4)) +
+    expand_limits(y = 5.2) +
     theme(legend.title = element_text(size = 20),
           legend.text = element_text(size = 15))
 p2 <- clustree(iris_clusts, prefix = "K", node_colour = "Petal.Length",
@@ -285,6 +289,7 @@ p2 <- clustree(iris_clusts, prefix = "K", node_colour = "Petal.Length",
            edge_alpha = guide_legend(title = "In-proportion",
                                      keywidth = 5,
                                      order = 4)) +
+    expand_limits(y = 5.2) +
     theme(legend.title = element_text(size = 20),
           legend.text = element_text(size = 15))
 panel <- plot_grid(p1, p2, labels = "AUTO", label_size = 30)
@@ -503,11 +508,15 @@ plots <- lapply(c("CD19", "CD14", "CD3D", "CCR7"), function(x) {
 legend <- get_legend(plots[[1]] +
                          guides(size = guide_legend(title = "Cluster size",
                                                     title.position = "top",
+                                                    title.hjust = 0.5,
+                                                    label.position = "top",
+                                                    label.hjust = 0.5,
                                                     order = 1),
                                 colour = FALSE,
                                 edge_colour = guide_edge_colourbar(
                                     title = "Sample count",
                                     title.position = "top",
+                                    title.hjust = 0.5,
                                     barwidth = 12,
                                     draw.ulim = TRUE,
                                     draw.llim = TRUE,
@@ -515,6 +524,9 @@ legend <- get_legend(plots[[1]] +
                                 edge_alpha = guide_legend(
                                     title = "In-proportion",
                                     title.position = "top",
+                                    title.hjust = 0.5,
+                                    label.position = "top",
+                                    label.hjust = 0.5,
                                     keywidth = 4,
                                     order = 4)) +
                          theme(legend.position = "bottom"))
