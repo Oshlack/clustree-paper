@@ -7,11 +7,11 @@ date: "1 Bioinformatics, Murdoch Children's Research Institute; 2 School of Bios
 output:
     bookdown::word_document2:
         reference_docx: style/style.docx
-        pandoc_args: [ "--csl", "style/nature.csl" ]
+        pandoc_args: [ "--csl", "style/gigascience.csl" ]
     bookdown::pdf_document2:
         toc: false
         number_sections: false
-        pandoc_args: [ "--csl", "style/nature.csl" ]
+        pandoc_args: [ "--csl", "style/gigascience.csl" ]
 documentclass: article
 classoption: a4paper
 bibliography: style/references.bib
