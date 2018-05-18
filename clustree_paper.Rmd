@@ -660,7 +660,7 @@ Not applicable.
 
 ## Availability of data and materials
 
-The clustree package is available from CRAN
+The clustree package (RRID: SCR_016293) is available from CRAN
 (https://CRAN.R-project.org/package=clustree) and is being developed on
 GitHub at https://github.com/lazappi/clustree. The code and datasets used for
 the analysis in this paper are available from
