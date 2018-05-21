@@ -9,7 +9,7 @@ Directory structure
 * `clustree_paper.Rmd` - RMarkdown file containing the manuscript
 * `data` - Data used in the analysis in the paper
 * `figures` - Figures used in the main paper
-<!--* `R` - R functions used in analysis-->
+* `R` - R functions used in analysis
 * `style` - Document style files
 
 R
