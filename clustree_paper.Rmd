@@ -15,7 +15,7 @@ output:
 documentclass: article
 classoption: a4paper
 bibliography: style/references.bib
-abstract: "Clustering techniques are widely used in the analysis of large data sets to group together samples with similar properties. For example, clustering is often used in the field of single-cell RNA-sequencing in order to identify different cell types present in a tissue sample. There are many algorithms for performing clustering and the results can vary substantially. In particular, the number of groups present in a data set is often unknown and the number of clusters identified by an algorithm can change based on the parameters used. To explore and examine the impact of varying clustering resolution we present clustering trees. This visualisation shows the relationships between clusters at multiple resolutions allowing researchers to see how samples move as the number of clusters increases. In addition, meta-information can be overlaid on the tree to inform the choice of resolution and guide in identification of clusters. We illustrate the uses of clustering trees using a series of simulations as well as two real examples, the classical iris dataset and a complex single-cell RNA-sequencing dataset. Clustering trees can be produced using the clustree R package available from CRAN (https://CRAN.R-project.org/package=clustree) and developed on GitHub (https://github.com/lazappi/clustree). \n\nKeywords: Clustering - Visualisation - scRNA-seq"
+abstract: "Clustering techniques are widely used in the analysis of large data sets to group together samples with similar properties. For example, clustering is often used in the field of single-cell RNA-sequencing in order to identify different cell types present in a tissue sample. There are many algorithms for performing clustering and the results can vary substantially. In particular, the number of groups present in a data set is often unknown and the number of clusters identified by an algorithm can change based on the parameters used. To explore and examine the impact of varying clustering resolution we present clustering trees. This visualisation shows the relationships between clusters at multiple resolutions allowing researchers to see how samples move as the number of clusters increases. In addition, meta-information can be overlaid on the tree to inform the choice of resolution and guide in identification of clusters. We illustrate the features of clustering trees using a series of simulations as well as two real examples, the classical iris dataset and a complex single-cell RNA-sequencing dataset. Clustering trees can be produced using the clustree R package available from CRAN (https://CRAN.R-project.org/package=clustree) and developed on GitHub (https://github.com/lazappi/clustree). \n\nKeywords: Clustering - Visualisation - scRNA-seq"
 ---
 
 ```{r setup, include = FALSE}
@@ -98,17 +98,18 @@ awarded increased stability if they share the same samples as a cluster at
 another resolution, but penalised for being at a higher resolution.
 
 A similar simple approach is taken by the clustering tree visualisation we
-present here, without calculating scores: (i) a dataset is clustered at
-multiple resolutions producing sets of cluster nodes, (ii) the overlap between
-clusters at adjacent resolutions is used to build edges, (iii) the resulting
-graph is presented as a tree. This tree can be used to examine how clusters are
-related to each other, which clusters are distinct and which are unstable. In
-the following sections we describe how we construct such a tree and present
-examples of trees built from a classical clustering dataset and a complex
-single-cell RNA-sequencing (scRNA-seq) dataset. The figures shown here can be
-produced in R using our publicly available clustree package. Although clustering
-trees can not directly provide a clustering resolution to use they can be a
-useful tool for exploring the range of possible choices.
+present here, without calculating scores: (i) a dataset is clustered using any
+hard clustering algorithm at multiple resolutions, producing sets of cluster
+nodes, (ii) the overlap between clusters at adjacent resolutions is used to
+build edges, (iii) the resulting graph is presented as a tree. This tree can be
+used to examine how clusters are related to each other, which clusters are
+distinct and which are unstable. In the following sections we describe how we
+construct such a tree and present examples of trees built from a classical
+clustering dataset and a complex single-cell RNA-sequencing (scRNA-seq)
+dataset. The figures shown here can be produced in R using our publicly
+available clustree package. Although clustering trees can not directly provide
+a clustering resolution to use they can be a useful tool for exploring and
+visualising the range of possible choices.
 
 # Building a clustering tree
 
@@ -188,12 +189,12 @@ the clustree package and how clustering trees could be used in practice.
 
 To demonstrate what a clustering tree can look like in different situations and
 how it behaves as a dataset is over-clustered we present some illustrative
-examples using simple simulations. We present five scenarios: random uniform
-noise, a single cluster, two clusters, three clusters and four clusters. Each
-cluster consists of 1000 points generated from a 100 dimensional normal
-distribution and each synthetic dataset has been clustered using $k$-means
-clustering with $k = 1,...,8$. We then use the clustree package to produce
-clustering trees for each dataset (Figure \@ref(fig:simulations)).
+examples using simple simulations (see methods). We present five scenarios:
+random uniform noise, a single cluster, two clusters, three clusters and four
+clusters. Each cluster consists of 1000 samples (points) generated from a 100
+dimensional normal distribution and each synthetic dataset has been clustered
+using $k$-means clustering with $k = 1,...,8$. We then use the clustree package
+to produce clustering trees for each dataset (Figure \@ref(fig:simulations)).
 
 ```{r get-sims}
 sims <- get_sims(ndim = 100, nsamples = 1000)
@@ -221,8 +222,8 @@ may also appear then disappear as the resolution increases as seen in Figure
 \@ref(fig:simulations)E. As we add more structure to the datasets the
 clustering trees begin to form clear branches and low in-proportion edges tend
 to be confined to sections of the tree. By looking at which clusters are stable
-and where low in-proportion edges form we can infer which areas of the tree are
-likely to be the result of true cluster and which are caused by
+and where low in-proportion edges arise we can infer which areas of the tree
+are likely to be the result of true clusters and which are caused by
 over-clustering.
 
 The second clustering tree for each dataset shows nodes coloured according to
@@ -305,8 +306,8 @@ We see that there is one branch of the tree that is clearly distinct
 number of clusters. On the other side we see the cluster at $k = 2$ cleanly
 splits into two clusters (presumably _Iris versicolor_ and _Iris virginica_) at
 $k = 3$ but as we move to $k = 4$ and $k = 5$ we see clusters being formed from
-multiple branches with more low proportion edges. As we have seen in the
-simulated example this kind of pattern can indicate that the data has become
+multiple branches with more low in-proportion edges. As we have seen in the
+simulated examples, this kind of pattern can indicate that the data has become
 over-clustered and we have begun to introduce artificial groupings.
 
 We can check our assumption that the distinct branch represents the _Iris
@@ -320,8 +321,8 @@ separate the samples into the expected species with _Iris setosa_ having the
 shortest petals on average, _Iris versicolor_ an intermediate length and _Iris
 virginica_ the longest.
 
-Although this is a very simple example it still highlights some of the benefits
-of viewing a clustering tree. We get some indication of the correct clustering
+Although this is a very simple example it highlights some of the benefits of
+viewing a clustering tree. We get some indication of the correct clustering
 resolution by examining the edges and we can overlay known information to
 assess the quality of the clustering. For example, if we observed that all
 clusters had the same mean petal length it would suggest that the clustering
@@ -344,12 +345,13 @@ to discover and interrogate the different cell types present in a sample of a
 complex tissue. In this situation, clustering is typically used to group
 similar cells based on their gene expression profiles. Differences in gene
 expression between groups can then be used to infer the identity or function of
-those cells [@Stegle2015-mc]. The number of cell types in an scRNA-seq dataset
-can vary depending on factors such as the tissue being studied, its
-developmental or environmental state and the number of cells captured. Often
-the number of cells types is not known before the data is generated and some
-samples can contain dozens of clusters. Therefore, deciding which clustering
-resolution to use is an important consideration in this application.
+those cells [@Stegle2015-mc]. The number of cell types (clusters) in an
+scRNA-seq dataset can vary depending on factors such as the tissue being
+studied, its developmental or environmental state and the number of cells
+captured. Often the number of cells types is not known before the data is
+generated and some samples can contain dozens of clusters. Therefore, deciding
+which clustering resolution to use is an important consideration in this
+application.
 
 As an example of how clustering trees can be used in the scRNA-seq context we
 consider a commonly used Peripheral Blood Mononuclear Cell (PBMC) dataset. This
@@ -562,15 +564,15 @@ addition of prior information.
 
 # Discussion and conclusion
 
-Clustering similar samples into groups is a useful technique in many fields, but
-often analysts are faced with the tricky problem of deciding which clustering
-resolution to use. Traditional approaches to this problem typically consider
-a single cluster or sample at a time and may rely on prior knowledge of sample
-labels. Here we present clustering trees, an alternative visualisation that
-shows the relationships between clusterings at multiple resolutions. While
-clustering trees cannot directly suggest which clustering resolution to use they
-can be a useful for helping to make that decision, particularly when combined
-with other metrics or domain knowledge.
+Clustering similar samples into groups is a useful technique in many fields,
+but often analysts are faced with the tricky problem of deciding which
+clustering resolution to use. Traditional approaches to this problem typically
+consider a single cluster or sample at a time and may rely on prior knowledge
+of sample labels. Here we present clustering trees, an alternative
+visualisation that shows the relationships between clusterings at multiple
+resolutions. While clustering trees cannot directly suggest which clustering
+resolution to use they can be a useful tool for helping to make that decision,
+particularly when combined with other metrics or domain knowledge.
 
 Clustering trees display how clusters are divided as resolution increases,
 which clusters are clearly separate and distinct, which are related to each
@@ -579,19 +581,19 @@ clustering trees can appear similar to the trees produced from hierarchical
 clustering there are several important differences. Hierarchical clustering
 considers the relationships between individual samples and doesn't provide an
 obvious way to form groups. In contrast, clustering trees are independent of
-any particular clustering method and show the relationships between distinct
-groups of samples, any of which could be used for further analysis.
+any particular clustering method and show the relationships between clusters,
+rather than samples, at different resolutions, any of which could be used for
+further analysis.
 
-To illustrate the uses of clustering trees we presented a series of
-demonstration simulations and two examples of real analyses, one using the
-classical iris dataset and a second based on a complex scRNA-seq dataset. Both
-examples demonstrate how a clustering tree can help inform the decision of
-which resolution to use and how overlaying extra information can help to
-validate those clusters. This is of particular use to scRNA-seq analysis as
-these datasets are often large, noisy and contain an unknown number of cell
-types.
+To illustrate the uses of clustering trees we presented a series of simulations
+and two examples of real analyses, one using the classical iris dataset and a
+second based on a complex scRNA-seq dataset. Both examples demonstrate how a
+clustering tree can help inform the decision of which resolution to use and how
+overlaying extra information can help to validate those clusters. This is of
+particular use to scRNA-seq analysis as these datasets are often large, noisy
+and contain an unknown number of cell types or clusters.
 
-Even when the number of clusters to choose is not a problem, clustering trees
+Even when determining the number of clusters is not a problem, clustering trees
 can be a valuable tool. They provide a compact, information dense,
 visualisation that can display summarised information across a range of
 clusters. By modifying the appearance of cluster nodes based on attributes of
@@ -618,14 +620,18 @@ of the igraph package.
 The first simulation consists of 1000 points randomly generated from a 100
 dimensional space using a uniform distribution. The remaining simulated
 datasets were constructed by combining sets of points representing clusters.
-Each cluster consists of 1000 points sampled from a 100 dimensional space. The
-first cluster was generated by selecting a centre in this space and generating
-points normally distributed around this centre. The following clusters were
-generated by applying a shift to an existing centre then generating 1000 points
-in the same way. Each simulated dataset was clustered using the "kmeans"
-function in the stats package with values of $k$ from one to eight, a maximum
-of 100 iterations and 10 random starting positions. The clustering tree
-visualisations were produced using the clustree package with the tree layout.
+Each cluster consists of 1000 points sampled from a 100 dimensional space. To
+create the desired relationships between clusters we first chose a centre point
+for each cluster. The first cluster centre was a randomly chosen point, then we
+added shifts to existing centres to create centres for the following clusters.
+Points for each cluster were generated from a normal distribution with mean
+equal to the cluster centre and a standard deviation of five. Each simulated
+dataset was clustered using the "kmeans" function in the stats package with
+values of $k$ from one to eight, a maximum of 100 iterations and 10 random
+starting positions. The clustering tree visualisations were produced using the
+clustree package with the tree layout. The simulated datasets and the code use
+to produce them are available from the repository for this paper
+(https://github.com/Oshlack/clustree-paper).
 
 ## Iris dataset
 
