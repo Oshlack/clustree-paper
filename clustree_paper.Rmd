@@ -48,6 +48,9 @@ library("ggplot2")
 library("cowplot")
 library("ggraph")
 
+# IO
+library("readr")
+
 # Document
 library("here")
 library("knitr")
@@ -197,11 +200,17 @@ using $k$-means clustering with $k = 1,...,8$. We then use the clustree package
 to produce clustering trees for each dataset (Figure \@ref(fig:simulations)).
 
 ```{r get-sims}
-sims <- get_sims(ndim = 100, nsamples = 1000)
+if (file.exists(here("data/simulations.Rds"))) {
+    sims <- read_rds(here("data/simulations.Rds"))
+} else {
+    sims <- get_sims(ndim = 100, nsamples = 1000)
+    write_rds(sims, here("data/simulations.Rds"))
+}
+
 clusts <- lapply(sims, cluster_sim, ks = 1:8)
 ```
 
-```{r simulations, fig.cap = "Five synthetic datasets used to demonstrate clustering trees. For each dataset a scatter plot of the first two principal components, a default clustering tree and and clustering tree with nodes coloured by the SC3 stability index from purple (lowest) to yellow (highest) are shown. The five datasets contain: A) random uniform noise, B) a single cluster, C) two clusters, D) three clusters and E) four clusters.", cache = FALSE}
+```{r simulations, fig.cap = "Five synthetic datasets used to demonstrate clustering trees. For each dataset a scatter plot of the first two principal components, a default clustering tree and and clustering tree with nodes coloured by the SC3 stability index from purple (lowest) to yellow (highest) are shown. The five datasets contain: A) random uniform noise, B) a single cluster, C) two clusters, D) three clusters and E) four clusters."}
 sim_panel <- make_sim_panel(sims, clusts)
 
 save_plot(here("figures/simulations.png"), sim_panel, nrow = 6, ncol = 3,
