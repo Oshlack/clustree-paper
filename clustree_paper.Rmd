@@ -33,6 +33,10 @@ knitr::opts_chunk$set(autodep        = TRUE,
                       dev            = c('png', 'pdf'),
                       message        = FALSE,
                       warning        = FALSE)
+
+if (FORMAT == "latex") {
+    knitr::opts_chunk$set(out.width = "100%")
+}
 ```
 
 ```{r libaries, cache = FALSE}
@@ -208,8 +212,16 @@ if (file.exists(here("data/simulations.Rds"))) {
     sims <- get_sims(ndim = 100, nsamples = 1000)
     write_rds(sims, here("data/simulations.Rds"))
 }
+```
 
-clusts <- lapply(sims, cluster_sim, ks = 1:8)
+```{r cluster-sims}
+if (file.exists(here("output/sim_clusterings.Rds"))) {
+    clusts <- read_rds(here("output/sim_clusterings.Rds"))
+} else {
+    set.seed(1)
+    clusts <- lapply(sims, cluster_sim, ks = 1:8)
+    write_rds(clusts, here("output/sim_clusterings.Rds"))
+}
 ```
 
 ```{r simulations, fig.cap = "Five synthetic datasets used to demonstrate clustering trees. For each dataset a scatter plot of the first two principal components, a default clustering tree and and clustering tree with nodes coloured by the SC3 stability index from purple (lowest) to yellow (highest) are shown. The five datasets contain: A) random uniform noise, B) a single cluster, C) two clusters, D) three clusters and E) four clusters."}

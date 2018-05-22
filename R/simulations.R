@@ -135,7 +135,7 @@ make_sim_panel <- function(sims, clusts) {
                            node_text_size = 8,
                            node_colour = "sc3_stability") +
             scale_colour_viridis_c(option = "plasma", begin = 0.3,
-                                   limits = c(0, 0.6)) +
+                                   limits = c(0, 0.7)) +
             expand_limits(y = 7.2) +
             theme(legend.position = "none",
                   plot.margin = unit(c(1, 1, 1.5, 1.2), "cm"))
