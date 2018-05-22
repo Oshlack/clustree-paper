@@ -193,11 +193,13 @@ the clustree package and how clustering trees could be used in practice.
 To demonstrate what a clustering tree can look like in different situations and
 how it behaves as a dataset is over-clustered we present some illustrative
 examples using simple simulations (see methods). We present five scenarios:
-random uniform noise, a single cluster, two clusters, three clusters and four
-clusters. Each cluster consists of 1000 samples (points) generated from a 100
-dimensional normal distribution and each synthetic dataset has been clustered
-using $k$-means clustering with $k = 1,...,8$. We then use the clustree package
-to produce clustering trees for each dataset (Figure \@ref(fig:simulations)).
+random uniform noise (Simulation A), a single cluster (Simulation B), two
+clusters (Simulation C),three clusters (Simulation D) and four clusters
+(Simulation E). Each cluster consists of 1000 samples (points) generated from a
+100 dimensional normal distribution and each synthetic dataset has been
+clustered using $k$-means clustering with $k = 1,...,8$. We then use the
+clustree package to produce clustering trees for each dataset (Figure
+\@ref(fig:simulations)).
 
 ```{r get-sims}
 if (file.exists(here("data/simulations.Rds"))) {
@@ -238,16 +240,17 @@ over-clustering.
 The second clustering tree for each dataset shows nodes coloured according to
 the SC3 stability index for each cluster. As we would expect in the first two
 examples no cluster receives a high stability score. However, while we clearly
-see two branches in the clustering tree for the two cluster example this is
-not reflected in the SC3 scores. No cluster receives a high stability score,
-most likely due to the high number of samples moving between clusters as the
-resolution increases. As there are more true clusters in the simulated datasets
-the SC3 stability scores become more predictive of the correct resolution to
-use, however it is important to look at the stability scores of all clusters at
-a particular resolution as taking the highest individual cluster stability score
-could lead to the incorrect resolution being used, as can be seen in the four
-cluster example. These examples show how clustering trees can be used to display
-existing clustering metrics in a way that can help to inform parameter choices.
+see two branches in the clustering tree for the two cluster example (Simulation
+C) this is not reflected in the SC3 scores. No cluster receives a high
+stability score, most likely due to the high number of samples moving between
+clusters as the resolution increases. As there are more true clusters in the
+simulated datasets the SC3 stability scores become more predictive of the
+correct resolution to use, however it is important to look at the stability
+scores of all clusters at a particular resolution as taking the highest
+individual cluster stability score could lead to the incorrect resolution being
+used, as can be seen in the four cluster example (Simulation E). These examples
+show how clustering trees can be used to display existing clustering metrics in
+a way that can help to inform parameter choices.
 
 # A simple example
 
@@ -626,20 +629,32 @@ of the igraph package.
 
 ## Simulations
 
-The first simulation consists of 1000 points randomly generated from a 100
-dimensional space using a uniform distribution. The remaining simulated
-datasets were constructed by combining sets of points representing clusters.
-Each cluster consists of 1000 points sampled from a 100 dimensional space. To
-create the desired relationships between clusters we first chose a centre point
-for each cluster. The first cluster centre was a randomly chosen point, then we
-added shifts to existing centres to create centres for the following clusters.
-Points for each cluster were generated from a normal distribution with mean
-equal to the cluster centre and a standard deviation of five. Each simulated
-dataset was clustered using the "kmeans" function in the stats package with
-values of $k$ from one to eight, a maximum of 100 iterations and 10 random
-starting positions. The clustering tree visualisations were produced using the
-clustree package with the tree layout. The simulated datasets and the code use
-to produce them are available from the repository for this paper
+Simulated datasets were constructed by generating points from statistical
+distributions. The first simulation (Simulation A) consists of 1000 points
+randomly generated from a 100 dimensional space using a uniform distribution
+between zero and 10. Simulation B consists of a single normally distributed
+cluster of 1000 points in 100 dimensions. The centre of this cluster was chosen
+from a normal distribution with mean zero and standard deviation 10. Points
+were then generated around this centre from a normal distribution with mean
+equal to the centre point and a standard deviation of five. The remaining three
+simulations were produced by adding additional clusters. In order to have a
+known relationship between clusters the centre for the new clusters was created
+by manipulating the centres of existing clusters. For Cluster 2 a random 100
+dimensional vector was generated from a normal distribution with mean zero and
+standard deviation two and added to the centre for Cluster 1. Centre 3 was the
+average of Centre 1 and Centre 2 plus a random vector from a normal
+distribution with mean zero and standard deviation five. To ensure a similar
+relationship between clusters 3 and 4 as between clusters 1 and 2, Centre 4 was
+produced by adding half the vector used to produce Centre 2 to Centre 3 plus
+another vector from a normal distribution with mean zero and standard deviation
+two. Points for each cluster were generated in the same way as for Cluster 1.
+Simulation C consists of the points in clusters 1 and 2, Simulation D consists
+of clusters 1, 2 and 3, Simulation E consists of clusters 1, 2, 3 and 4. Each
+simulated dataset was clustered using the "kmeans" function in the stats
+package with values of $k$ from one to eight, a maximum of 100 iterations and
+10 random starting positions. The clustering tree visualisations were produced
+using the clustree package with the tree layout. The simulated datasets and the
+code use to produce them are available from the repository for this paper
 (https://github.com/Oshlack/clustree-paper).
 
 ## Iris dataset
