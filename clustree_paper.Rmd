@@ -51,6 +51,7 @@ library("Matrix")
 library("ggplot2")
 library("cowplot")
 library("ggraph")
+library("viridis")
 
 # IO
 library("readr")
@@ -138,7 +139,7 @@ special case of a directed acyclic graph where the underlying undirected graph
 is a tree [@Rebane2013-hn].
 
 ```{r algorithm, fig.cap = "Illustration of the steps required to build a clustering tree. First a dataset must be clustered at different resolutions. The overlap in samples between clusters at adjacent resolutions is computed and used to calculate the in-proportion for each edge. Finally the edges are filtered and the graph visualised as a tree.", cache = FALSE}
-include_graphics(here("figures/algorithm2.png"))
+include_graphics(here("figures/figure1_algorithm.png"))
 ```
 
 Many of the edges will be empty, for example in Figure \@ref(fig:algorithm) no
@@ -227,12 +228,12 @@ if (file.exists(here("output/sim_clusterings.Rds"))) {
 ```{r simulations, fig.cap = "Five synthetic datasets used to demonstrate clustering trees. For each dataset a scatter plot of the first two principal components, a default clustering tree and and clustering tree with nodes coloured by the SC3 stability index from purple (lowest) to yellow (highest) are shown. The five datasets contain: A) random uniform noise, B) a single cluster, C) two clusters, D) three clusters and E) four clusters."}
 sim_panel <- make_sim_panel(sims, clusts)
 
-save_plot(here("figures/simulations.png"), sim_panel, nrow = 6, ncol = 3,
-          base_width = 8, base_height = 6)
-save_plot(here("figures/simulations.pdf"), sim_panel, nrow = 6, ncol = 3,
-          base_width = 8, base_height = 6)
+save_plot(here("figures/figure2_simulations.png"), sim_panel,
+          nrow = 6, ncol = 3, base_width = 8, base_height = 6)
+save_plot(here("figures/figure2_simulations.pdf"), sim_panel,
+          nrow = 6, ncol = 3, base_width = 8, base_height = 6)
 
-include_graphics(here("figures/simulations.png"))
+include_graphics(here("figures/figure2_simulations.png"))
 ```
 
 Looking at the first two examples (uniform noise (Figure
@@ -301,7 +302,7 @@ p1 <- clustree(iris_clusts, prefix = "K", node_size_range = c(10, 30),
 p2 <- clustree(iris_clusts, prefix = "K", node_colour = "Petal.Length",
                node_colour_aggr = "mean", node_size_range = c(10, 30),
                node_text_size = 8, edge_width = 4, layout = "sugiyama") +
-    scale_colour_viridis_c(option = "plasma", begin = 0.3) +
+    scale_colour_viridis(option = "plasma", begin = 0.3) +
     guides(size = guide_legend(title = "Cluster size", order = 1),
            colour = guide_colourbar(title = "Petal length",
                                     barwidth = 3,
@@ -319,10 +320,12 @@ p2 <- clustree(iris_clusts, prefix = "K", node_colour = "Petal.Length",
           legend.text = element_text(size = 15))
 panel <- plot_grid(p1, p2, labels = "AUTO", label_size = 30)
 
-save_plot(here("figures/iris_tree.png"), panel, ncol = 2, base_height = 10)
-save_plot(here("figures/iris_tree.pdf"), panel, ncol = 2, base_height = 10)
+save_plot(here("figures/figure3_iris_tree.png"), panel,
+          ncol = 2, base_height = 10)
+save_plot(here("figures/figure3_iris_tree.pdf"), panel,
+          ncol = 2, base_height = 10)
 
-include_graphics(here("figures/iris_tree.png"))
+include_graphics(here("figures/figure3_iris_tree.png"))
 ```
 
 We see that there is one branch of the tree that is clearly distinct
@@ -480,10 +483,10 @@ p2 <- clustree(pbmc_lo, node_size_range = c(8, 25), node_text_size = 6,
 
 panel <- plot_grid(p1, p2, labels = "AUTO", label_size = 30)
 
-ggsave(here("figures/seurat_tree.png"), panel, width = 28, height = 12)
-ggsave(here("figures/seurat_tree.pdf"), panel, width = 28, height = 12)
+ggsave(here("figures/figure4_seurat_tree.png"), panel, width = 28, height = 12)
+ggsave(here("figures/figure4_seurat_tree.pdf"), panel, width = 28, height = 12)
 
-include_graphics(here("figures/seurat_tree.png"))
+include_graphics(here("figures/figure4_seurat_tree.png"))
 ```
 
 The clustering tree covering resolutions zero to one in steps of 0.1 (Figure
@@ -519,7 +522,7 @@ plots <- lapply(c("CD19", "CD14", "CD3D", "CCR7"), function(x) {
     clustree(pbmc, node_colour = x, node_colour_aggr = "mean",
              node_size_range = c(6, 20), node_text_size = 4,
              edge_width = 2.5) +
-    scale_colour_viridis_c(option = "plasma", begin = 0.3) +
+    scale_colour_viridis(option = "plasma", begin = 0.3) +
     guides(size = FALSE,
            colour = guide_colourbar(title = x,
                                     barwidth = 2,
@@ -561,12 +564,12 @@ panel <- plot_grid(plotlist = plots,
                    label_size = 30, hjust = -0.1)
 panel_legend <- plot_grid(panel, legend, ncol = 1, rel_heights = c(1, .1))
 
-save_plot(here("figures/seurat_genes.png"), panel_legend, ncol = 2,
+save_plot(here("figures/figure5_seurat_genes.png"), panel_legend, ncol = 2,
           base_height = 16, base_aspect_ratio = 0.8)
-save_plot(here("figures/seurat_genes.pdf"), panel_legend, ncol = 2,
+save_plot(here("figures/figure5_seurat_genes.pdf"), panel_legend, ncol = 2,
           base_height = 16, base_aspect_ratio = 0.8)
 
-include_graphics(here("figures/seurat_genes.png"))
+include_graphics(here("figures/figure5_seurat_genes.png"))
 ```
 
 By adding this extra information, we can quickly identify some of the cell
