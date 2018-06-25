@@ -632,11 +632,17 @@ clustering methods.
 
 ## clustree
 
-The clustree software package is built for the R statistical programming
-language. It relies on the ggraph package [@Pedersen2018-ie], which is itself
-built on the ggplot2 [@Wickham2010-zq] and tidygraph [@Pedersen2018-ly]
-packages. Clustering trees are displayed using the Reingold-Tilford tree layout
-or the Sugiyama layout, both available as part of the igraph package.
+The clustree software package (v`r packageVersion("clustree")`) is built for
+the R statistical programming language
+(v`r strsplit(R.version.string, " ")[[1]][3]`). It relies on the ggraph package
+(v`r packageVersion("ggraph")`) [@Pedersen2018-ie], which is itself built on the
+ggplot2 (v`r packageVersion("ggplot2")`) [@Wickham2010-zq] and tidygraph
+(v`r packageVersion("tidygraph")`) [@Pedersen2018-ly] packages. Clustering trees
+are displayed using the Reingold-Tilford tree layout or the Sugiyama layout,
+both available as part of the igraph package (v`r packageVersion("igraph")`).
+
+Figure panels shown here were produced using the cowplot package
+(v`r packageVersion("cowplot")`) [@Wilke2017-zt].
 
 ## Simulations
 
@@ -680,10 +686,11 @@ part of the clustree package.
 ## PBMC dataset
 
 The PBMC dataset was downloaded from the Seurat tutorial page
-[@Satija_Lab2018-qf] and this tutorial was followed for most of the analysis.
-Briefly cells were filtered based on the number of genes they express and the
-percentage of counts assigned to mitochondrial genes. The data was then
-log-normalised and 1838 variable genes identified. Potential confounding
+[@Satija_Lab2018-qf] and this tutorial was followed for most of the analysis
+using Seurat version `r packageVersion("Seurat")`. Briefly cells were filtered
+based on the number of genes they express and the percentage of counts assigned
+to mitochondrial genes. The data was then log-normalised and
+`r length(pbmc@var.genes)` variable genes identified. Potential confounding
 variables (number of unique molecular identifiers and percentage mitochondrial
 expression) were regressed from the dataset before performing principal
 component analysis on the identified variable genes. The first 10 principal
@@ -725,8 +732,9 @@ RRID: SCR_016293
 
 ## Abbreviations
 
-- PBMC: peripheral blood mononuclear cell
-- scRNA-seq: single-cell RNA-sequencing
+PBMC: peripheral blood mononuclear cell
+
+scRNA-seq: single-cell RNA-sequencing
 
 ## Consent for publication
 
