@@ -31,8 +31,8 @@ Data
 Figures
 -------
 
-* `algorithm2.png` - Diagram of the clustering tree algorithm
-* `algorithm2.pdf` - Diagram of the clustering tree algorithm
+* `figure2_algorithm.png` - Diagram of the clustering tree algorithm
+* `figure2_algorithm.pdf` - Diagram of the clustering tree algorithm
 * Automatically generated figures will also be placed here
 
 Style
