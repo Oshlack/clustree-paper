@@ -440,7 +440,7 @@ pbmc_lo@meta.data <- pbmc_lo@meta.data[, paste0("res.", seq(0, 5, 0.5))]
 pbmc@meta.data <- pbmc@meta.data[, paste0("res.", seq(0, 1, 0.1))]
 ```
 
-```{r seurat-tree, fig.cap = "Two clustering trees of a dataset of 2700 Peripheral Blood Mononuclear Cells (PBMCs). A) results from clustering using Seurat with resolution parameters from zero to one. At a resolution of 0.1 we see the formation of four main branches, one of which continues to split up to a resolution of 0.5, after which there are only minor changes. B) resolutions from zero to five. At the highest resolutions we begin to see many low in-proportion edges indicating cluster instability. Seurat labels clusters according to their size with Cluster 0 being the largest."}
+```{r seurat-tree, fig.cap = "Two clustering trees of a dataset of 2700 Peripheral Blood Mononuclear Cells (PBMCs). A) results from clustering using Seurat with resolution parameters from zero to one. At a resolution of 0.1 we see the formation of four main branches, one of which continues to split up to a resolution of 0.4, after which there are only minor changes. B) resolutions from zero to five. At the highest resolutions we begin to see many low in-proportion edges indicating cluster instability. Seurat labels clusters according to their size with Cluster 0 being the largest."}
 p1 <- clustree(pbmc, node_size_range = c(8, 25), node_text_size = 6,
                edge_width = 3) +
     guides(size = guide_legend(title = "Cluster size", order = 1),
@@ -496,7 +496,7 @@ remains unchanged while the branch starting with Cluster 2 splits only once at
 a resolution of 0.4. Most of the branching occurs in the branch starting with
 Cluster 1 which consistently has sub-branches split off to form new clusters as
 the resolution increases. There are two regions of stability in this tree; at
-resolution 0.5-0.6 and resolution 0.7-1.0 where the branch starting at Cluster
+resolution 0.4-0.5 and resolution 0.7-1.0 where the branch starting at Cluster
 0 splits in two.
 
 Figure \@ref(fig:seurat-tree)B shows a clustering tree with a greater range of
